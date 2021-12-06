@@ -6,7 +6,14 @@ This [Gofetch](https://goaddon.com/en/addons/5b9ff6463ab42f43522b30cf) repositor
 - Make requests to a webshop through the Gofetch Shop API
 - View merchants unfinished or failed integration attempts (auths)
 
-####Adding your own pages
+#### Versions
+
+The repository has two branches:
+
+- 1-main_menu assigns its menu entries to the main menu. Since main menu entries are displayed to all users, but these entries are only relevant for superusers, this branch should only be deployed if there are no regular users.
+- 1-superuser_menu assigns its menu entries to the SUPERUSER menu, which is only displayed to superusers.
+
+#### Adding your own pages
 
 This main functionality in this repository centers around three pages: *webshops__index*, *auths__index* and *tickets__index*.
 
@@ -70,7 +77,7 @@ and these paths:
 ]
 ```
 
-####Sending emails to external recipients
+#### Sending emails to external recipients
 
 If you are using the ticketing functionality to communicate with external recipients, such as the owners of an account, you need to [register your SMTP settings](https://goaddon.com/en/addons/5bb227d283c3360abe01e036/manage#page=smtp) with Goexplore.
 
