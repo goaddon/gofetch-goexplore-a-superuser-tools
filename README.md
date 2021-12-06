@@ -6,7 +6,7 @@ This [Gofetch](https://goaddon.com/en/addons/5b9ff6463ab42f43522b30cf) repositor
 - Make requests to a webshop through the Gofetch Shop API
 - View merchants unfinished or failed integration attempts (auths)
 
-## Versions
+## Branches
 
 The repository has two branches:
 
