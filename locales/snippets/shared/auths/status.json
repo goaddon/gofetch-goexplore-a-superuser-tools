@@ -1,0 +1,9 @@
+{
+  "en": {
+    "statuses": {
+      "success": "Success",
+      "error": "Error",
+      "in_progress": "In progress"
+    }
+  }
+}

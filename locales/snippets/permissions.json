@@ -1,0 +1,17 @@
+{
+  "en": {
+    "headlines": {
+      "superuser_level_1": "Manage superuser permissions",
+      "superuser": "Your permissions"
+    },
+    "headers": {
+      "email": "Email"
+    },
+    "buttons": {
+      "show": "Manage"
+    },
+    "superuser_levels": {
+      "l1": "level 1 access"
+    }
+  }
+}

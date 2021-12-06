@@ -1,0 +1,13 @@
+{
+  "en": {
+    "pager": {
+      "previous": "Previous",
+      "next": "Next"
+    },
+    "per_page": {
+      "label": "Choose the number of results per page",
+      "outro": "results",
+      "selected_outro": "per page"
+    }
+  }
+}

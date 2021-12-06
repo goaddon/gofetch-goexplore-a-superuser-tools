@@ -1,0 +1,79 @@
+{
+  "en": {
+    "headlines": {
+      "intro": "Use the Shop API for",
+      "or": "or",
+      "return": "return",
+      "error": "Error, please",
+      "ticket": "ticket",
+      "tickets": "tickets",
+      "open": "open"
+    },
+    "resource_names": {
+      "products": "Products",
+      "variants": "Variants",
+      "orders": "Orders",
+      "shop_ids": "Shop ID's",
+      "statuses": "Statuses",
+      "customers": "Customers",
+      "webshops": "Webshops",
+      "categories": "Categories"
+    },
+    "headers": {
+      "description": "Description",
+      "comments": "Comments",
+      "params": "Parameters",
+      "body": "Body"
+    },
+    "body_sample": {
+      "intro": "Edit the request body, based on",
+      "link": "these instructions",
+      "reset_intro": "You can",
+      "reset_button": "reset here",
+      "reset_outro": "or toggle between the templates below, provided specifically for this integration"
+    },
+    "custom_params": {
+      "intro": "For this integration it is possible to submit custom parameters.",
+      "no_conjunction": "They can not be used in conjunction with any of the parameters above and will bypass the database.",
+      "link": "View custom parameters"
+    },
+    "labels": {
+      "default_1": "Choose the",
+      "default_2": "that the request relates to.",
+      "unfiltered_response": "Include the unfiltered response from the shop",
+      "bypass_db": "Bypass the database",
+      "custom_1": "Enter value for"
+    },
+    "placeholders": {
+      "default_1": "Type",
+      "default_2": "here..."
+    },
+    "buttons": {
+      "submit": "Submit",
+      "submitting": "Submitting..."
+    },
+    "informations": {
+      "edit": "edit"
+    },
+    "description": {
+      "link": "Read more"
+    },
+    "comments": {
+      "p1": "maintains the relay responsible for this",
+      "p2": "integration, and they have provided",
+      "link": "these additional comments"
+    },
+    "caution": {
+      "intro": "CAUTION!",
+      "message": "Different shops are wired differently, so please be carefull when performing state changing requests."
+    },
+    "param_dropdowns": {
+      "iso_8601_date": {
+        "button": "Suggestions",
+        "hours": "hours",
+        "days": "days",
+        "ago": "ago"
+      }
+    }
+  }
+}

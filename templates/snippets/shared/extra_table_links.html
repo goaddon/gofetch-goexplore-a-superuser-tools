@@ -1,0 +1,14 @@
+{% if table_cols != nil %}
+  {% for table_col in table_cols %}
+
+    {% assign table_td = table_col | split: ";" %}
+
+    {% if table_td.size == 3 %}
+
+      {% assign link_path = table_td[0] %}
+      {% assign link_name = table_td[1] %}
+      {% assign link_icon = table_td[2] %}
+      {% include "shared/table_link" %}
+    {% endif %}
+  {% endfor %}
+{% endif %}

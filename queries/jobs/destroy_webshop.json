@@ -1,0 +1,81 @@
+{
+  "webshops": {
+    "klass": "webshops",
+    "query": {
+      "_id": "{{ webshop_id }}",
+      "company_id": "{{ company_id }}"
+    }
+  },
+  "destroy_customers": {
+    "klass": "customers",
+    "query": {
+      "webshop_id": "{{ webshop_id }}"
+    }
+  },
+  "destroy_orders": {
+    "klass": "orders",
+    "query": {
+      "webshop_id": "{{ webshop_id }}"
+    }
+  },
+  "destroy_order_lines": {
+    "klass": "order_lines",
+    "query": {
+      "webshop_id": "{{ webshop_id }}"
+    }
+  },
+  "destroy_shipments": {
+    "klass": "shipments",
+    "query": {
+      "webshop_id": "{{ webshop_id }}"
+    }
+  },
+  "destroy_variants": {
+    "klass": "variants",
+    "query": {
+      "webshop_id": "{{ webshop_id }}"
+    }
+  },
+  "destroy_products": {
+    "klass": "products",
+    "query": {
+      "webshop_id": "{{ webshop_id }}"
+    }
+  },
+  "destroy_categories": {
+    "klass": "categories",
+    "query": {
+      "webshop_id": "{{ webshop_id }}"
+    }
+  },
+  "destroy_countries": {
+    "klass": "countries",
+    "query": {
+      "webshop_id": "{{ webshop_id }}"
+    }
+  },
+  "destroy_delivery_methods": {
+    "klass": "delivery_methods",
+    "query": {
+      "webshop_id": "{{ webshop_id }}"
+    }
+  },
+  "destroy_payment_methods": {
+    "klass": "payment_methods",
+    "query": {
+      "webshop_id": "{{ webshop_id }}"
+    }
+  },
+  "destroy_stock_messages": {
+    "klass": "stock_messages",
+    "query": {
+      "webshop_id": "{{ webshop_id }}"
+    }
+  },
+  "destroy_statuses": {
+    "klass": "statuses",
+    "query": {
+      "webshop_id": "{{ webshop_id }}"
+    }
+  }
+}

@@ -1,0 +1,101 @@
+{% if project.secrets.gofetch_webhook_token == nil or project.secrets.gofetch_webhook_token != headers.authorization %}
+
+  {"status": "500", "error": "Can not authorize"}
+
+{% else %}
+
+  {% assign events = "ticket_created ticket_updated ticket_updated_by_support" | split: " " %}
+
+  {% if events contains params.event and params.details.ticket_id != nil %}
+
+    {% assign documents_query = "tickets" | db_find: ticket_id: params.details.ticket_id %}
+    {% assign document        = documents_query.results.first %}
+
+    {% if document == nil %}
+
+      {"status": "422", "error": "Ticket not found"}
+
+    {% else %}
+
+      {% if document.company_id != nil %}
+
+        {% assign companies_query = "companies" | db_find: company_id: document.company_id %}
+        {% assign company         = companies_query.results.first %}
+
+        {% if company != nil %}
+
+          {% assign website = company.website %}
+
+        {% endif %}
+
+      {% endif %}
+
+      {% assign superusers_query = "superusers" | db_find: app_id: project.app_id %}
+      {% assign superusers       = superusers_query.results | to_hash: "_id" %}
+
+      {% assign emails                = "" | split: " " %}
+      {% assign assigned_superuser_id = document.superuser_id %}
+      {% assign assigned_superuser    = superusers[assigned_superuser_id] %}
+
+      {% if assigned_superuser != nil %}
+
+        {% assign emails = emails | push_to_array: assigned_superuser.email %}
+
+      {% else %}
+
+        {% assign open_statuses  = "opened escalated" | split: " " %}
+
+        {% for superuser in superusers %}
+
+          {% if superuser[1].notification_relay_ids != nil and superuser[1].notification_relay_ids contains document.relay_id %}
+
+            {% assign emails = emails | push_to_array: superuser[1].email %}
+
+          {% elsif superuser[1].superuser_level != 1 %}
+
+            {% if superuser[1].closed_ticket_relay_ids != nil and superuser[1].closed_ticket_relay_ids.size > 0 %}
+
+              {% assign permitted_relay_ids = superuser[1].closed_ticket_relay_ids %}
+
+            {% elsif open_statuses contains document.status and superuser[1].ticket_relay_ids != nil and superuser[1].ticket_relay_ids.size > 0 %}
+
+              {% assign permitted_relay_ids = superuser[1].ticket_relay_ids %}
+
+            {% endif %}
+
+            {% if permitted_relay_ids != nil and permitted_relay_ids contains document.relay_id %}
+
+              {% assign emails = emails | push_to_array: superuser[1].email %}
+
+            {% endif %}
+          {% endif %}
+        {% endfor %}
+
+        {% if emails.size == 0 %}
+          {% for superuser in superusers %}
+            {% if superuser[1].superuser_level == 1 %}
+
+              {% assign emails = emails | push_to_array: superuser[1].email %}
+
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+      {% endif %}
+
+      {% include "shared/superuser_ticket_url" %}
+
+      {% for email in emails %}
+
+        {% assign send_result = params.event | send_email: to: email, ticket_id: document._id, ticket_url: superuser_ticket_url, website: website, auth_id: document.auth_id %}
+
+      {% endfor %}
+    {% endif %}
+
+    {"status": "204"}
+
+  {% else %}
+
+    {"status": "422", "error": "Unknown event"}
+
+  {% endif %}
+{% endif %}

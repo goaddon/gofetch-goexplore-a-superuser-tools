@@ -1,0 +1,96 @@
+{
+  "en": {
+    "headlines": {
+      "error": "Error, please",
+      "intro": "View this ticket, or",
+      "return": "return"
+    },
+    "headers": {
+      "status": "Status",
+      "relay": "Ecommerce platform",
+      "webshop": "Webshop",
+      "assignee": "Assignee",
+      "options": "Options",
+      "email": "Email",
+      "phone": "Phone",
+      "status": "Status",
+      "admin_url": "Admin URL",
+      "admin_username": "Admin username",
+      "admin_password": "Admin password",
+      "ftp_host": "FTP host",
+      "ftp_username": "FTP username",
+      "ftp_password": "FTP password",
+      "ssh_address": "SSH address",
+      "ssh_password": "SSH password",
+      "opened_at": "Opened",
+      "closed_at": "Closed",
+      "escalated_at": "Escalated",
+      "re_opened_at": "Re-opened"
+    },
+    "company_relations": {
+      "belongs_to_none": {
+        "intro": "NB!",
+        "message": "This ticket does not belong to any account."
+      }
+    },
+    "informations": {
+      "ago": "ago",
+      "edit_webshop": "Edit",
+      "or": "or",
+      "show_webshop": "use the Shop API"
+    },
+    "update_status": {
+      "links": {
+        "claim": "Claim",
+        "closed": "close",
+        "escalated": "escalate",
+        "de_escalated": "de-escalate",
+        "re_opened": "re-open"
+      },
+      "append_strings": {
+        "or": " or "
+      }
+    },
+    "confirm_escalate": {
+      "confirm_intro": "Support for this shop is provided by **",
+      "confirm_outro": "**. Their current support fees are described below:\n\n",
+      "title": "Please confirm",
+      "commit": "OK, escalate!",
+      "cancel": "Cancel"
+    },
+    "assign": {
+      "assign": "assign",
+      "reassign": "reassign",
+      "header": "Choose assignee",
+      "unassign": "Unassign"
+    },
+    "recipients": {
+      "label": "Recipients",
+      "placeholder": "Select recipients from the list or type in email addresses...",
+      "author": "author",
+      "app_user": "user",
+      "unknown_user": "external user",
+      "superuser": "superuser",
+      "relay": "support"
+    },
+    "subject": {
+      "expand": "Add subject",
+      "placeholder": "The subject is added to external emails only. If none is provided your default subject will be used..."
+    },
+    "message": {
+      "label": "Message",
+      "placeholder": "Write a message with markdown such as **bold**, _cursive_, `code` and [links](https://example.com). Wrap code blocks in ```, ```json, etc., but beware that html tags are stripped from this page."
+    },
+    "send_message": {
+      "button": "Send"
+    },
+    "log": {
+      "header": "Activity log"
+    },
+    "log_body": {
+      "assigned": "Assigned to",
+      "unassigned": "Unassigned",
+      "by": "by"
+    }
+  }
+}

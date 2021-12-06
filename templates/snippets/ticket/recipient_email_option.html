@@ -1,0 +1,8 @@
+{% unless known_recipients contains recipient %}
+  {% if recipient contains "@" %}
+
+    <option data-recipient="{{ recipient }}" value="{{ recipient }}"></option>
+    {% assign known_recipients = known_recipients | push_to_array: recipient %}
+
+  {% endif %}
+{% endunless %}

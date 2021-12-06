@@ -1,0 +1,17 @@
+{% assign identifier = nil %}
+
+{% for superuser in superusers %}
+
+  {% if superuser[0] == superuser_id %}
+
+    {% assign identifier = superuser[1].email %}
+
+  {% endif %}
+
+{% endfor %}
+
+{% if identifier == nil %}
+
+  {% assign identifier = superuser_id %}
+
+{% endif %}

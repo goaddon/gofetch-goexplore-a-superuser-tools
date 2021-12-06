@@ -1,0 +1,36 @@
+{
+  "update_config": {
+    "klass": "webshops",
+    "query": {
+      "company_id": "{{ company_id }}",
+      "_id": "{{ _id }}"
+    },
+    "document": {
+      "$set": {
+        "config": "{{ config }}"
+      }
+    }
+  },
+  "reset_got_at_attr": {
+    "klass": "webshops",
+    "query": {
+      "company_id": "{{ company_id }}",
+      "_id": "{{ _id }}"
+    },
+    "document": {
+      "$set": "{{ document }}"
+    }
+  },
+  "toggle_active": {
+    "klass": "webshops",
+    "query": {
+      "company_id": "{{ company_id }}",
+      "_id": "{{ _id }}"
+    },
+    "document": {
+      "$set": {
+        "active": "{{ active }}"
+      }
+    }
+  }
+}

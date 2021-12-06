@@ -1,0 +1,561 @@
+{% if error != nil %}
+  <h5 class="mb-4">
+    {{ l.headlines.error }} <a href="{{ 'tickets__index' | path_for: page: params.page, per_page: params.per_page, scope: params.scope }}">{{ l.headlines.return }} <i class="fas fa-undo"></i></a>
+  </h5>
+  <p class="text-danger">{{ error }}.</p>
+{% else %}
+
+  <h5 class="mb-4">
+    {{ l.headlines.intro }} <a href="{{ 'tickets__index' | path_for: page: params.page, per_page: params.per_page, scope: params.scope }}">{{ l.headlines.return }} <i class="fas fa-undo"></i></a>
+  </h5>
+
+  {% if document.company_id == nil %}
+
+    <div class="alert alert-primary px-2 py-1">
+      <b>{{ l.company_relations.belongs_to_none.intro }}</b> {{ l.company_relations.belongs_to_none.message }}
+    </div>
+
+  {% endif %}
+
+  {% assign now               = "now" | in_time_zone %}
+  {% assign left_tr_count     = 0 %}
+  {% assign right_tr_count    = 0 %}
+  {% assign form_field_names  = "email phone admin_url admin_username admin_password ftp_host ftp_username ftp_password ssh_address ssh_password" | split: " " %}
+
+  {% for form_field_name in form_field_names %}
+    {% if document[form_field_name] != nil and document[form_field_name] != "" %}
+      {% assign right_tr_count = right_tr_count | plus: 1 %}
+    {% endif %}
+  {% endfor %}
+
+  <div class="row">
+    <div class="col-md-12 col-lg-7">
+      <table class="table mb-0">
+        <tbody>
+          {% assign status_field_names  = "opened_at escalated_at closed_at re_opened_at" | split: " " %}
+          {% assign timeline     = "" | split: " " %}
+
+          {% for status_field_name in status_field_names %}
+
+            {% if document[status_field_name] != nil %}
+
+              {% assign status_field  = nil | new_hash: name: status_field_name, value: document[status_field_name] %}
+              {% assign timeline      = timeline | push_to_array: status_field %}
+
+            {% endif %}
+
+          {% endfor %}
+
+          {% assign timeline      = timeline | sort: "value" %}
+          {% assign left_tr_count = left_tr_count | plus: 1 %}
+
+          <tr>
+            <td width="1" class="text-nowrap">
+              <b>{{ l.headers.status }}:</b>
+            </td>
+            <td>
+              {% assign ticket_status = document.status %}
+              {% include "shared/ticket_status" %}
+            </td>
+          </tr>
+
+          {% if relay != nil %}
+
+            {% assign left_tr_count = left_tr_count | plus: 1 %}
+
+            <tr>
+              <td width="1" class="text-nowrap">
+                <b>{{ l.headers.relay }}:</b>
+              </td>
+              <td>
+                {{ relay.name }}
+              </td>
+            </tr>
+          {% endif %}
+
+          {% if document.webshop_id != nil %}
+
+            {% assign left_tr_count = left_tr_count | plus: 1 %}
+
+            <tr>
+              <td width="1" class="text-nowrap">
+                <b>{{ l.headers.webshop }}:</b>
+              </td>
+              <td>
+                <a href="{{ 'webshops__edit' | path_for: id: document.webshop_id }}">{{ l.informations.edit_webshop }}</a> &#183; <a href="{{ 'webshops__edit' | path_for: id: document.webshop_id }}" target="_blank"><i class="fas fa-external-link-alt"></i></a> {{ l.informations.or }} <a href="{{ 'webshops__show' | path_for: id: document.webshop_id }}">{{ l.informations.show_webshop }}</a> &#183; <a href="{{ 'webshops__show' | path_for: id: document.webshop_id }}" target="_blank"><i class="fas fa-external-link-alt"></i></a>
+              </td>
+            </tr>
+          {% endif %}
+
+          {% if document.superuser_id != nil %}
+
+            {% assign left_tr_count = left_tr_count | plus: 1 %}
+
+            <tr>
+              <td width="1" class="text-nowrap">
+                <b>{{ l.headers.assignee }}:</b>
+              </td>
+              <td>
+                {% assign superuser_id = document.superuser_id %}
+                {% include "ticket/superuser_identifier" %}
+                {{ identifier }}
+              </td>
+            </tr>
+          {% endif %}
+
+          {% assign left_tr_count = left_tr_count | plus: 1 %}
+
+          <tr>
+            <td width="1" class="text-nowrap">
+              <b>{{ l.headers.options }}:</b>
+            </td>
+            <td>
+
+              {% assign action_count      = 0 %}
+              {% assign action_number     = 0 %}
+              {% assign superusers_count  = 0 %}
+
+              {% for superuser in superusers %}
+
+                {% include "ticket/superuser_assignable" %}
+
+                {% if assignable and superuser[0] != document.superuser_id %}
+
+                  {% assign superusers_count = superusers_count | plus: 1 %}
+
+                {% endif %}
+              {% endfor %}
+
+              {% if document.superuser_id != user._id %}
+
+                {% assign action_count  = action_count | plus: 1 %}
+                {% assign action_number = action_number | plus: 1 %}
+
+                {% if document.superuser_id == nil and superusers_count == 0 and document.status == "closed" %}
+
+                  {% assign claim_append = l.update_status.append_strings.or %}
+
+                {% else %}
+
+                  {% assign claim_append = "," %}
+
+                {% endif %}
+
+                <form class="d-inline" action="{{ 'tickets__update' | path_for: id: document._id, format: 'js' }}" method="post" data-remote="true">
+                  <input type="hidden" name="_method" value="patch">
+                  <input type="hidden" name="superuser_id" value="{{ user._id }}"><input type="submit" class="bg-body border-0 link-primary p-0" value="{{ l.update_status.links.claim }}">{{ claim_append }}
+                </form>
+
+              {% endif %}
+
+              {% if document.status == "closed" %}
+
+                {% assign statuses      = "re_opened" | split: " " %}
+
+              {% elsif document.status == "escalated" %}
+
+                {% assign statuses      = "de_escalated closed" | split: " " %}
+
+              {% else %}
+
+                {% assign statuses      = "closed" | split: " " %}
+
+                {% if status.escalated_at != nil %}
+                  {% assign statuses = statuses | push_to_array: "de_escalated" %}
+                {% elsif relay.support_fees != nil %}
+                  {% assign statuses = statuses | push_to_array: "escalated" %}
+                {% endif %}
+
+              {% endif %}
+
+              {% for status in statuses %}
+                {% if document.status != status %}
+                  {% assign action_count = action_count | plus: 1 %}
+                {% endif %}
+              {% endfor %}
+
+              {% assign second_last_action_number = action_count | minus: 1 %}
+
+              {% for status in statuses %}
+                {% if document.status != status %}
+
+                  {% assign action_number = action_number | plus: 1 %}
+
+                  {% if action_count == 1 or action_number == action_count %}
+                    {% if superusers_count == 0 and document.superuser_id == nil %}
+
+                      {% assign append_string = "" %}
+
+                    {% else %}
+
+                      {% assign append_string = l.update_status.append_strings.or %}
+
+                    {% endif %}
+                  {% elsif action_number == second_last_action_number %}
+                    {% if superusers_count == 0 and document.superuser_id == nil %}
+
+                      {% assign append_string = l.update_status.append_strings.or %}
+
+                    {% else %}
+
+                      {% assign append_string = ", " %}
+
+                    {% endif %}                
+                  {% else %}
+
+                    {% assign append_string = ", " %}
+
+                  {% endif %}
+
+                  {% if action_number == 1 %}
+                    {% assign link_text = l.update_status.links[status] | capitalize %}
+                  {% else %}
+                    {% assign link_text = l.update_status.links[status] %}
+                  {% endif %}
+
+                  {% if status == "escalated" %}
+
+                    <form class="d-inline" action="{{ 'tickets__update' | path_for: id: document._id, format: 'js' }}" method="post" data-remote="true">
+                      <input type="hidden" name="_method" value="patch">
+                      <input type="hidden" name="status" value="{{ status }}"><input type="submit" class="bg-body border-0 link-primary p-0" id="markdown_confirm" value="{{ link_text }}" data-title="{{ l.confirm_escalate.title }}" data-confirm="" data-markdown="{{ l.confirm_escalate.confirm_intro | strip_html | url_encode }}{{ relay.author | strip_html | url_encode }}{{ l.confirm_escalate.confirm_outro | strip_html | url_encode }}{{ relay.support_fees | strip_html | url_encode }}" data-commit="{{ l.confirm_escalate.commit }}" data-cancel="{{ l.confirm_escalate.cancel }}" data-commit-class="btn btn-outline-primary" data-cancel-class="text-primary">{{ append_string }}
+                    </form>
+
+                  {% else %}
+
+                    <form class="d-inline" action="{{ 'tickets__update' | path_for: id: document._id, format: 'js' }}" method="post" data-remote="true">
+                      <input type="hidden" name="_method" value="patch">
+                      <input type="hidden" name="status" value="{{ status }}"><input type="submit" class="bg-body border-0 link-primary p-0" value="{{ link_text }}">{{ append_string }}
+                    </form>
+
+                  {% endif %}
+                {% endif %}
+              {% endfor %}
+
+              {% if superusers_count > 0 or document.superuser_id != nil %}
+                <div class="dropend d-inline">
+                  <button class="dropdown-link d-inline border-0 py-0 px-0 text-primary bg-white dropdown-toggle" type="button" id="assign_ticket" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{% if document.superuser_id == nil %}{{ l.assign.assign }}{% else %}{{ l.assign.reassign }}{% endif %}</button>
+                  <ul class="dropdown-menu" aria-labelledby="assign_ticket">
+                    <h6 class="dropdown-header px-3">{{ l.assign.header }}</h6>
+                    <div class="dropdown-divider mb-1"></div>
+
+                    {% for superuser in superusers %}
+
+                      <li>
+                        {% include "ticket/superuser_assignable" %}
+
+                        {% if assignable and superuser[0] != document.superuser_id %}
+
+                          <form action="{{ 'tickets__update' | path_for: id: document._id, format: 'js' }}" method="post" data-remote="true">
+                            <input type="hidden" name="_method" value="patch">
+                            <input type="hidden" name="superuser_id" value="{{ superuser[0] }}"><input type="submit" class="px-3 py-1 bg-body border-0 link-primary px-3" value="{{ superuser[1].email }}">
+                          </form>
+
+                        {% endif %}
+                      </li>
+                    {% endfor %}
+
+                    {% if document.superuser_id != nil %}
+
+                      {% if superusers_count > 0 %}
+
+                        <div class="dropdown-divider mb-1"></div>
+
+                      {% endif %}
+
+                      <li>
+                        <form action="{{ 'tickets__update' | path_for: id: document._id, format: 'js' }}" method="post" data-remote="true">
+                          <input type="hidden" name="_method" value="patch">
+                          <input type="hidden" name="superuser_id" value="none"><input type="submit" class="px-3 py-1 bg-body border-0 link-danger px-3" value="{{ l.assign.unassign }}">
+                        </form>
+                      </li>
+
+                    {% endif %}
+
+                  </ul>
+                </div>
+              {% endif %}
+
+            </td>
+          </tr>
+
+          {% for t in timeline %}
+            {% assign status_name = t.name %}
+            {% if document[status_name] != nil and document[status_name] != "" %}
+
+              {% assign left_tr_count       = left_tr_count | plus: 1 %}
+              {% assign bottom_border_klass = "" %}
+
+              {% if t == timeline.last %}
+                {% if left_tr_count >= right_tr_count and document.comments != nil and document.comments != "" %}
+
+                  {% assign bottom_border_klass = "border-bottom" %}
+
+                {% endif %}
+              {% endif %}
+
+              <tr>
+                <td width="1" class="text-nowrap {{ bottom_border_klass }}">
+                  <b>{{ l.headers[status_name] }}:</b>
+                </td>
+                <td class="{{ bottom_border_klass }}">
+                  <span title="{{ document[status_name] | i18n_l: 'wday_date_hours_minutes' | capitalize }}">
+                    {{ document[status_name] | time_distance_in_words: now | capitalize }} {{ l.informations.ago }}
+                  </span>
+                </td>
+              </tr>
+            {% endif %}
+          {% endfor %}
+
+          {% if left_tr_count < right_tr_count and document.comments != nil and document.comments != "" %}
+            {% include "ticket/comments" %}
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="col-md-12 col-lg-5">
+      <table class="table mb-0">
+        <tbody>
+          {% for form_field_name in form_field_names %}
+            {% if document[form_field_name] != nil and document[form_field_name] != "" %}
+              <tr>
+                <td width="1" class="text-nowrap">
+                  <b>{{ l.headers[form_field_name] }}:</b>
+                  <input type="text" value="{{ document[form_field_name] | decrypt }}" data-copy="{{ form_field_name }}" style="display:none;">
+                </td>
+                <td class="text-break">
+                  {{ document[form_field_name] | decrypt | strip_html }}
+                </td>
+                <td width="1">
+                  <i class="far fa-copy text-primary" data-copy-button="{{ form_field_name }}" style="cursor:pointer;" onclick="copyFormInput('{{ form_field_name }}')"></i>
+                  <i class="fas fa-copy text-primary" data-copy-placeholder="{{ form_field_name }}" style="cursor:pointer;display:none;"></i>
+                </td>
+              </tr>
+            {% endif %}
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  {% if left_tr_count >= right_tr_count and document.comments != nil and document.comments != "" %}
+
+    <table class="table mb-0">
+      <tbody>
+        {% include "ticket/comments" %}
+      </tbody>
+    </table>
+
+  {% endif %}
+
+  <form class="my-4" id="message_form" action="{{ 'tickets__update' | path_for: id: document._id, format: 'js' }}" method="post" data-remote="true">
+    <input type="hidden" name="_method" value="patch">
+    <div class="mb-3">
+      <b><label for="recipients">{{ l.recipients.label }}:</label></b><br>
+      <select name="recipients[]" class="form-control input-select2-recipients" multiple id="recipients">
+
+        {% assign known_recipients = "" | split: " " %}
+
+        {% if document_email != nil %}
+        
+          {% assign recipient = document_email %}
+          {% include "ticket/recipient_email_option" %}
+
+        {% endif %}
+
+        {% if document.status == "escalated" %}
+
+          <option data-recipient="relay" value="relay"></option>
+
+        {% endif %}
+
+        {% for superuser in superusers %}
+
+          {% include "ticket/superuser_assignable" %}
+
+          {% if assignable %}
+
+            <option data-recipient="{{ superuser[1].email }}" value="{{ superuser[0] }}"></option>
+            {% assign known_recipients = known_recipients | push_to_array: superuser[1].email %}
+
+          {% endif %}
+        {% endfor %}
+
+        {% if document.log != nil %}
+          {% for log_entry in document.log %}
+            {% if log_entry.recipients != nil %}
+              {% for recipient in log_entry.recipients %}
+                {% include "ticket/recipient_email_option" %}
+              {% endfor %}
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+
+        {% for recipient in app_user_emails %}
+          {% include "ticket/recipient_email_option" %}
+        {% endfor %}
+
+        {% for recipient in unknown_user_emails %}
+          {% include "ticket/recipient_email_option" %}
+        {% endfor %}
+
+      </select>
+    </div>
+
+    <div class="mb-3">
+
+      {% if document.subject != nil %}
+        {% assign expand_subject  = "true" %}
+        {% assign subject_klass   = "show" %}
+      {% else %}
+        {% assign expand_subject  = "false" %}
+        {% assign subject_klass   = "collapse" %}
+      {% endif %}
+
+      <a class="" data-bs-toggle="collapse" href="#subject_input" role="button" aria-expanded="{{ expand_subject }}" aria-controls="subject_input">{{ l.subject.expand }} <i class="fas fa-caret-down"></i></a>
+      <div class="{{ subject_klass }}" id="subject_input">
+        <input name="subject" placeholder="{{ l.subject.placeholder }}" class="form-control" value="{{ document.subject }}"></input>
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <b><label for="message">{{ l.message.label }}:</label></b>
+      <textarea name="message" placeholder="{{ l.message.placeholder }}" class="form-control" rows="2" onkeyup="textAreaAdjust(this)" onpaste="textAreaAdjust(this)" style="overflow:hidden;resize:none;"></textarea>
+    </div>
+
+    <div class="d-grid gap-2">
+      <input type="submit" class="btn btn-outline-primary" value="{{ l.send_message.button }}">
+    </div>
+  </form>
+
+  <div class="accordion" id="log_accordion">
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="card_log">
+        <button class="accordion-button link-primary collapsed bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_card_log" aria-expanded="false" aria-controls="collapse_card_log">
+          {{ l.log.header }}
+        </button>
+      </h2>
+
+      {% if document.log != nil and document.log.size > 0 %}
+        {% assign toggle_klass = " show" %}
+      {% else %}
+        {% assign toggle_klass = "" %}
+      {% endif %}
+
+      <div id="collapse_card_log" class="accordion-collapse collapse{{ toggle_klass }}" aria-labelledby="card_log" data-bs-parent="#log_accordion">
+        <div class="accordion-body">
+          <table class="table" id="log_table">
+            <tbody>
+
+              {% if document.log != nil %}
+                {% assign log = document.log | reverse %}
+
+                {% for log_entry in log %}
+
+                  {% if log_entry.message != nil %}
+
+                    {% if log_entry.author_id == "relay" %}
+
+                      {% assign identifier = "relay" %}
+
+                    {% elsif log_entry.author_id == "merchant" %}
+
+                      {% assign identifier = document_email %}
+
+                    {% elsif log_entry.author_id == "unknown" %}
+
+                      {% assign identifier = "unknown" %}
+
+                    {% else %}
+
+                      {% assign identifier = log_entry.author_id %}
+
+                    {% endif %}
+
+                    {% include "shared/tickets/message_tr" %}
+
+                  {% else %}
+
+                    <tr>
+                      <td>
+                        {% assign unassigned = false %}
+
+                        {% for log_kv in log_entry %}
+                          {% if log_kv[0] == "superuser_id" and log_kv[1] == nil %}
+
+                            {% assign unassigned = true %}
+
+                          {% endif %}
+                        {% endfor %}
+
+                        {% if unassigned %}
+                        
+                          {{ l.log_body.unassigned }}
+
+                        {% else %}
+                          {% if log_entry.superuser_id != nil %}
+
+                            {{ l.log_body.assigned }}
+
+                            {% assign superuser_id = log_entry.superuser_id %}
+
+                            {% include "ticket/superuser_identifier" %}
+
+                            <span class="border rounded text-nowrap px-1 me-1">{{ identifier }}</span>
+
+                          {% elsif log_entry.status != nil %}
+
+                            {% assign ticket_status = log_entry.status %}
+
+                            {% include "shared/ticket_status" %}
+
+                          {% endif %}
+                        {% endif %}
+                      </td>
+                      {% assign td_klass = "" %}
+                      {% include "shared/tickets/log_entry_time_td" %}
+                    </tr>
+                  {% endif %}
+                {% endfor %}
+              {% endif %}
+
+              <tr>
+                <td>
+                  {% assign ticket_status = "opened" %}
+                  {% include "shared/ticket_status" %}
+
+                  {{ l.log_body.by }} 
+
+                  {% if document.author_id == "merchant" %}
+
+                    {% assign identifier = document_email %}
+
+                  {% else %}
+
+                    {% assign superuser_id = document.author_id %}
+
+                    {% include "ticket/superuser_identifier" %}
+
+                  {% endif %}
+
+                  <span class="border rounded text-nowrap px-1 me-1">{{ identifier }}</span>
+
+                </td>
+                {% assign log_entry = nil | new_hash: created_at: document.opened_at %}
+                {% assign td_klass = "" %}
+                {% include "shared/tickets/log_entry_time_td" %}
+              </tr>
+
+            </tbody>
+          </table>
+         </div>
+      </div>
+    </div>
+  </div>
+
+  {% if auth != nil %}
+
+    {% include "shared/auth_result" %}
+
+  {% endif %}
+{% endif %}

@@ -1,0 +1,20 @@
+{
+  "superusers": {
+    "klass": "users",
+    "query": {
+      "app_id": "{{ app_id }}",
+      "_id": "{{ _id }}"
+    },
+    "projection": {
+      "_id": 1,
+      "email": 1,
+      "superuser": 1,
+      "superuser_level": 1,
+      "webshop_relay_ids": 1,
+      "ticket_relay_ids": 1,
+      "closed_ticket_relay_ids": 1,
+      "auth_relay_ids": 1,
+      "notification_relay_ids": 1
+    }
+  }
+}

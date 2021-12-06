@@ -1,0 +1,9 @@
+{% if project.secrets.gofetch_interface_url != nil %}
+
+  {% capture ticket_url %}{{ project.secrets.gofetch_interface_url }}#action=tickets__show&ticket_id={{ document._id }}&token={{ document.token | decrypt }}{% endcapture %}
+
+{% else %}
+
+  {% assign ticket_url = nil %}
+
+{% endif %}

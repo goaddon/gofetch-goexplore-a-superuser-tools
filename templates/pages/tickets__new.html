@@ -1,0 +1,36 @@
+{% if account != nil and user.superuser %}
+
+  {% if params.webshop_id != nil %}
+
+    {% assign return_path     = "webshops__edit" %}
+    {% assign klass_name      = "webshop_id" %}
+    {% assign klass           = "webshop" %}
+    {% assign klass_id        = params.webshop_id %}
+
+    {% assign webshops_query  = "webshops" | db_find: _id: klass_id %}
+    {% assign document        = webshops_query.results.first %}
+
+  {% elsif params.auth_id != nil %}
+
+    {% assign return_path     = "auths__show" %}
+    {% assign klass_name      = "auth_id" %}
+    {% assign klass           = "auth" %}
+    {% assign klass_id        = params.auth_id %}
+
+    {% assign auths_query     = "auths" | db_find: _id: klass_id %}
+    {% assign document        = auths_query.results.first %}
+
+  {% else %}
+
+    {% assign error = l.errors.no_klass %}
+
+  {% endif %}
+
+  {% if error == nil and document == nil %}
+
+    {% assign error = l.errors.no_document[klass] %}
+
+  {% endif %}
+
+  {% include "new_ticket" %}
+{% endif %}

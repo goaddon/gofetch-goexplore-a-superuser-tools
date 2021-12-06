@@ -1,0 +1,14 @@
+{
+  "tickets": {
+    "klass": "tickets",
+    "query": {
+      "_id": "{{ _id }}"
+    }
+  },
+  "auths": {
+    "klass": "auths",
+    "query": {
+      "_id": "{{ _id }}"
+    }
+  }
+}

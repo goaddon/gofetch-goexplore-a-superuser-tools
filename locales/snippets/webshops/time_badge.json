@@ -1,0 +1,16 @@
+{
+  "en": {
+    "times": {
+      "seconds": "s",
+      "minutes": "m",
+      "hours": "h",
+      "days": "d",
+      "weeks": "w",
+      "months": "mth",
+      "years": "yr"
+    },
+    "informations": {
+      "ago": "ago"
+    }
+  }
+}

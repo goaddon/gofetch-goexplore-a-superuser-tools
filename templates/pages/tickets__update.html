@@ -1,0 +1,232 @@
+  {% if account != nil and user.superuser %}
+
+    {% assign documents_query = "tickets" | db_find: _id: params.id %}
+    {% assign document        = documents_query.results.first %}
+
+    {% if document == nil %}
+
+      flashAlert("error", "{{ l.response_texts.not_found }}");
+
+    {% else %}
+
+      {% include "shared/tickets/check_user_access" %}
+
+      {% if error != nil %}
+
+        flashAlert("error", "{{ error }}");
+
+      {% else %}
+
+        {% include "shared/tickets/users" %}
+
+        {% if document.company_id == account._id %}
+
+          {% assign recipient_account = account %}
+          {% assign recipient_website = recipient_account.website %}
+
+        {% endif %}
+
+        {% assign redirect_to       = nil %}
+        {% assign now               = "now" | in_time_zone %}
+        {% assign attributes        = nil | new_hash %}
+        {% assign log_entry         = nil | new_hash %}
+
+        {% if params.superuser_id != nil %}
+
+          {% if params.superuser_id == "none" %}
+
+            {% assign superuser_id  = nil %}
+            {% assign response_text = l.response_texts.superuser_id_unassigned %}
+
+          {% elsif params.superuser_id.size == 24 %}
+
+            {% assign superuser_id  = params.superuser_id %}
+            {% assign response_text = l.response_texts.superuser_id_updated %}
+
+            {% if superuser_id != user._id and superusers[superuser_id].email != nil %}
+
+              {% include "shared/superuser_ticket_url" %}
+
+              {% assign send_result = "ticket_assigned" | send_email: to: superusers[superuser_id].email, ticket_id: document._id, auth_id: document.auth_id, website: recipient_website, superuser_email: user.email, ticket_url: superuser_ticket_url %}
+
+            {% endif %}
+          {% endif %}
+
+          {% assign attributes  = attributes | push_to_hash: "superuser_id", superuser_id %}
+          {% assign log_entry   = log_entry | push_to_hash: "superuser_id", superuser_id %}
+
+        {% elsif params.message != nil and params.message != "" %}
+
+          {% if params.recipients == nil %}
+
+            {% assign recipients = "" | split: " " %}
+
+          {% else %}
+
+            {% assign recipients = params.recipients %}
+
+          {% endif %}
+
+          {% if params.subject != nil and params.subject != "" and params.subject != document.subject %}
+
+            {% assign subject     = params.subject %}
+            {% assign attributes  = attributes | push_to_hash: "subject", subject %}
+
+          {% else %}
+
+            {% assign subject     = document.subject %}
+
+          {% endif %}
+
+          {% assign log_entry     = log_entry | push_to_hash: "recipients", recipients %}
+          {% assign message       = params.message | encrypt %}
+          {% assign log_entry     = log_entry | push_to_hash: "message", message %}
+          {% assign log_entry     = log_entry | push_to_hash: "author_id", user._id %}
+          {% assign response_text = l.response_texts.message_saved %}
+
+        {% elsif params.status != nil %}
+
+          {% assign params_status = params.status %}
+
+          {% capture status_time %}{{ params_status }}_at{% endcapture %}
+
+          {% assign attributes    = attributes | push_to_hash: status_time, now %}
+          {% assign log_entry     = log_entry | push_to_hash: "status", params_status %}
+          {% assign response_text = l.response_texts.status_changed[params_status] %}
+
+          {% if params_status == "closed" %}
+
+            {% assign attributes = attributes | push_to_hash: "re_opened_at", nil %}
+            {% assign attributes = attributes | push_to_hash: "escalated_at", nil %}
+            {% assign attributes = attributes | push_to_hash: "de_escalated_at", nil %}
+            {% assign attributes = attributes | push_to_hash: "superuser_id", nil %}
+
+            {% if user.superuser_level != 1 %}
+
+              {% assign redirect_to = "tickets__index" | path_for %}
+   
+            {% endif %}
+
+
+          {% elsif params_status == "de_escalated" %}
+
+            {% assign attributes = attributes | push_to_hash: "escalated_at", nil %}
+
+          {% endif %}
+
+          {% if params_status == "re_opened" or params_status == "de_escalated" %}
+
+            {% assign status = "opened" %}
+
+          {% else %}    
+
+            {% assign status = params_status %}
+
+          {% endif %}    
+
+          {% assign attributes = attributes | push_to_hash: "status", status %}
+
+        {% endif %}
+
+        {% if attributes.size > 0 or log_entry.size > 0 %}
+          {% if document.log == nil %}
+
+            {% assign log = "" | split: " " %}
+
+          {% else %}
+
+            {% assign log = document.log %}
+
+          {% endif %}
+
+          {% assign log_entry_id    = nil | new_uuid %}
+          {% assign log_entry       = log_entry | push_to_hash: "id", log_entry_id %}
+          {% assign log_entry       = log_entry | push_to_hash: "created_at", now %}
+          {% assign log             = log | push_to_array: log_entry %}
+          {% assign attributes      = attributes | push_to_hash: "log", log %}
+          
+          {% if attributes.status != "closed" %}
+
+            {% assign attributes = attributes | push_to_hash: "updated_at", now %}
+
+          {% endif %}
+
+          {% assign tickets_update  = "update_ticket" | db_update_one: _id: params.id, document: attributes %}
+
+        {% endif %}
+
+        {% if tickets_update == nil %}
+          flashAlert("error", "{{ l.response_texts.invalid_params }}");
+        {% else %}
+          {% if tickets_update.matched_count != 1 %}
+            flashAlert("error", "{{ l.response_texts.not_found }}");
+          {% elsif tickets_update.updated_count != 1 %}
+            flashAlert("message", "{{ l.response_texts.not_updated }}");
+          {% else %}
+            flashAlert("success", "{{ response_text }}");
+            {% if log_entry.message != nil %}
+
+              {% assign job_ids = nil | new_hash %}
+
+              {% include "shared/superuser_ticket_url" %}
+
+              {% if project.secrets.gofetch_interface_url != nil %}
+
+                {% capture ticket_url %}{{ project.secrets.gofetch_interface_url }}#action=tickets__show&ticket_id={{ document._id }}&token={{ document.token | decrypt }}{% endcapture %}
+
+              {% else %}
+
+                {% assign ticket_url = nil %}
+
+              {% endif %}
+
+              {% for recipient in log_entry.recipients %}
+
+                {% if recipient contains "@" %}
+
+                  {% if project.secrets.ticket_message_email_name != nil and project.secrets.ticket_message_email_name != nil %}
+
+                    {% assign ticket_message_email_name = project.secrets.ticket_message_email_name %}
+
+                  {% else %}
+
+                    {% assign ticket_message_email_name = "external_ticket_message" %}
+
+                  {% endif %}
+
+                  {% assign send_result = ticket_message_email_name | send_email: to: recipient, ticket_id: document._id, ticket_url: ticket_url, account: recipient_account, subject: subject, message: params.rendered_message %}
+                  {% assign job_ids     = job_ids | push_to_hash: recipient, send_result.job_id %}
+
+                {% elsif recipient.size == 24 and superusers[recipient].email != nil %}
+
+                  {% assign send_result = "superuser_ticket_message" | send_email: to: superusers[recipient].email, ticket_id: document._id, auth_id: document.auth_id, website: recipient_website, ticket_url: superuser_ticket_url, superuser_email: user.email %}
+                  {% assign job_ids     = job_ids | push_to_hash: recipient, send_result.job_id %}
+
+                {% endif %}
+
+              {% endfor %}
+
+              $("#log_table tbody tr:first").before('{% assign identifier = user._id %}{% include "shared/tickets/message_tr" %}');
+
+              {% for job_id in job_ids %}
+
+                checkEmailJob("{{ log_entry_id }}", "{{ job_id[1] }}");
+
+              {% endfor %}
+
+            {% else %}
+              {% if redirect_to != nil %}
+
+                Turbo.visit("{{ redirect_to }}");
+
+              {% else %}
+
+                Turbo.visit(window.location);
+
+              {% endif %}
+            {% endif %}
+          {% endif %}
+        {% endif %}
+      {% endif %}
+    {% endif %}
+  {% endif %}

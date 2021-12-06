@@ -1,0 +1,10 @@
+{
+  "relays": {
+    "method": "get",
+    "url": "https://gofetch-{{ zone }}-api.goaddon.com/project_api/v1/relays",
+    "headers": {
+      "Content-Type": "application/json",
+      "Authorization": "{{ gofetch_project_api_token }}"
+    }
+  }
+}

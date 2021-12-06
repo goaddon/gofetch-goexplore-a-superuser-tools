@@ -1,0 +1,20 @@
+{% assign auth_status = document.status %}
+
+{% case auth_status %}
+  {% when "success" %}
+
+    {% assign status_style = "success" %}
+
+  {% when "error" %}
+
+    {% assign status_style = "danger" %}
+
+  {% when "in_progress" %}
+
+    {% assign status_style = "success" %}
+
+{% endcase %}
+
+<span class="text-{{ status_style }} border rounded border-{{ status_style }} px-1">
+  {{ l.statuses[auth_status] }}
+</span>

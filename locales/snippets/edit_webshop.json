@@ -1,0 +1,103 @@
+{
+  "en": {
+    "headlines": {
+      "intro": "Edit this",
+      "outro": "webshop, or",
+      "return": "return",
+      "error": "Error, please",
+      "config": "Change configuration",
+      "reset": "Queue imports",
+      "webhook_token": "Webhook token",
+      "tickets": "Tickets",
+      "danger_zone": "Danger zone",
+      "errors": "Errors"
+    },
+    "buttons": {
+      "submit": "Update",
+      "submitting": "Updating...",
+      "reset": "Reset",
+      "resetting": "Resetting..."
+    },
+    "explainers": {
+      "config": {
+        "p1": "Below you can change the configuration of this webshop. The configuration is immediately applied and can be used in",
+        "p2": "the Shop API"
+      },
+      "webhook_token": {
+        "p1": "To the extend this ecommerce platform supports delivering data through webhooks, the webshop uses",
+        "p2": "this webhook token"
+      },
+      "reset": {
+        "p1": "Every time Gofetch gets new data from this webshop, your database is updated with a timestamp that represents the time where it took place. Data is imported as frequent as your schedule allows for",
+        "p2": "If you reset a timestamp, the shop will immediately be queued for a new import. If you plan to reset multiple timestamps you may want to deactivate the integration first, or the shop will be queued while you are still working"
+      },
+      "active": {
+        "p1": "This webshop was created",
+        "p2": "ago, and is currently",
+        "active": "active",
+        "inactive": "deactivated",
+        "p3": "You can",
+        "active_options": {
+          "active": "deactivate it",
+          "inactive": "activate it"
+        }
+      },
+      "new_ticket": {
+        "p1": "You can",
+        "p2": "create a ticket"
+      },
+      "tickets": {
+        "ticket": "ticket",
+        "tickets": "tickets",
+        "p1": "has been registered for this webshop"
+      },
+      "errors": {
+        "intro": "The integration errored",
+        "ago": "ago",
+        "p1": "The last attempt to import",
+        "p2": "resulted in the following error",
+        "categories": "categories",
+        "customers": "customers",
+        "orders": "orders",
+        "products": "products"
+      }
+    },
+    "input": {
+      "ago": "ago"
+    },
+    "attributes": {
+      "got_started_at": "Started last import",
+      "got_finished_at": "Finished last import",
+      "got_error_at": "Got error",
+      "got_products_created_since_catch_all_date_at": "Got products created since day 0",
+      "got_products_created_since_last_request_at": "Got products created since last time",
+      "got_products_updated_since_catch_all_date_at": "Got products updated since day 0",
+      "got_products_updated_since_last_request_at": "Got products updated since last time",
+      "got_categories_created_since_catch_all_date_at": "Got categories created since day 0",
+      "got_categories_created_since_last_request_at": "Got categories created since last time",
+      "got_categories_updated_since_catch_all_date_at": "Got categories updated since day 0",
+      "got_categories_updated_since_last_request_at": "Got categories updated since last time",
+      "got_customers_created_since_catch_all_date_at": "Got customers created since day 0",
+      "got_customers_created_since_last_request_at": "Got customers created since last time",
+      "got_customers_updated_since_catch_all_date_at": "Got customers updated since day 0",
+      "got_customers_updated_since_last_request_at": "Got customers updated since last time",
+      "got_orders_created_since_catch_all_date_at": "Got orders created a while back",
+      "got_orders_created_since_last_request_at": "Got orders created since last time",
+      "got_orders_updated_since_catch_all_date_at": "Got orders updated a while back",
+      "got_orders_updated_since_last_request_at": "Got orders updated since last time",
+      "got_orders_open_since_1x_at": "Got orders that were open last time we checked (time interval 1)",
+      "got_orders_open_since_2x_at": "Got orders that were open last time we checked (time interval 2)",
+      "got_orders_open_since_3x_at": "Got orders that were open last time we checked (time interval 3)",
+      "got_orders_open_since_4x_at": "Got orders that were open last time we checked (time interval 4)"
+    },
+    "destroy": {
+      "intro": "You can",
+      "button": "destroy this webshop",
+      "title": "Are you sure?",
+      "confirm": "This can not be undone!",
+      "commit": "OK, destroy this webshop!",
+      "cancel": "Cancel",
+      "outro": "This action will also destroy all associated customers, orders, order lines, shipments, variants, products, categories, countries, delivery methods, payment methods, stock messages and statuses from your database."
+    }
+  }
+}

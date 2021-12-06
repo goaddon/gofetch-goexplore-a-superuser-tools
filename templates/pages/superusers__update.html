@@ -1,0 +1,34 @@
+{% if account != nil and user.superuser and user.superuser_level == 1 %}
+
+  {% assign permission_types  = "webshop_relay_ids ticket_relay_ids closed_ticket_relay_ids notification_relay_ids auth_relay_ids" | split: " " %}
+  {% assign permission_type   = params.permission_type %}
+  {% unless permission_types contains permission_type  %}
+
+    flashAlert("error", "{{ l.response_texts.unknown_permission_type }}");
+
+  {% else %}
+
+    {% assign relay_ids = params[permission_type] %}
+
+    {% if relay_ids == nil %}
+
+      {% assign relay_ids = "" | split: " " %}
+
+    {% endif %}
+
+    {% assign document          = nil | new_hash | push_to_hash: permission_type, relay_ids %}
+    {% assign superusers_update = "update_superuser" | db_update_one: app_id: project.app_id, _id: params.id, document: document %}
+
+    {% if superusers_update == nil %}
+      flashAlert("error", "{{ l.response_texts.invalid_params }}");
+    {% else %}
+      {% if superusers_update.matched_count != 1 %}
+        flashAlert("error", "{{ l.response_texts.not_found }}");
+      {% elsif superusers_update.updated_count != 1 %}
+        flashAlert("message", "{{ l.response_texts.not_updated }}");
+      {% else %}
+        flashAlert("success", "{{ l.response_texts.updated }}");
+      {% endif %}
+    {% endif %}
+  {% endunless %}
+{% endif %}

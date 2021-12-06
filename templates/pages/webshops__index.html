@@ -1,0 +1,54 @@
+{% if account != nil and user.superuser %}
+
+  {% assign scope = params.scope %}
+  {% assign query = nil | new_hash %}
+
+  {% case params.scope %}
+
+    {% when "active" %}
+
+      {% assign query = query | push_to_hash: "active", true %}
+
+    {% when "inactive" %}
+
+      {% assign query = query | push_to_hash: "active", false %}
+
+    {% when "erroring" %}
+
+      {% assign query           = query | push_to_hash: "active", true %}
+      {% assign got_error_at_q  = nil | new_hash %}
+      {% assign got_error_at_q  = got_error_at_q | push_to_hash: "$ne", nil %}
+      {% assign query           = query | push_to_hash: "got_error_at", got_error_at_q %}
+
+    {% else %}
+
+      {% assign scope = nil %}
+      {% assign query = query | push_to_hash: "company_id", account._id %}
+
+  {% endcase %}
+
+  {% if query.size > 0 %}
+
+    {% assign documents_query = "webshops" | db_find: query: query, page: params.page, per_page: params.per_page %}
+    {% assign documents       = documents_query.results %}
+
+    {% assign webshop_ids = "" %}
+
+    {% for document in documents %}
+      {% capture webshop_ids %}{{ webshop_ids }} {{ document._id }}{% endcapture %}
+    {% endfor %}
+
+    {% assign webshop_ids = webshop_ids | lstrip | split: " " | uniq %}
+
+    {% if webshop_ids.size > 0 %}
+
+      {% assign tickets_query   = "tickets" | db_find: webshop_ids: webshop_ids %}
+      {% assign tickets         = tickets_query.results | to_hash_groups: "webshop_id" %}
+
+    {% endif %}
+
+    {% include "shared/get_gofetch_relays" %}
+    {% include "webshops" %}
+
+  {% endif %}
+{% endif %}

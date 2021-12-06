@@ -1,0 +1,194 @@
+{% if error != nil %}
+  <h5 class="mb-4">
+    {{ l.headlines.error }} <a href="{{ 'webshops__index' | path_for: page: params.page, per_page: params.per_page, scope: params.scope }}">{{ l.headlines.return }} <i class="fas fa-undo"></i></a>
+  </h5>
+  <p class="text-danger">{{ error }}.</p>
+{% else %}
+  <h5 class="mb-4">
+    {{ l.headlines.intro }} {{ relay.name }} {{ l.headlines.outro }} <a href="{{ 'webshops__index' | path_for: page: params.page, per_page: params.per_page, scope: params.scope }}">{{ l.headlines.return }} <i class="fas fa-undo"></i></a>
+  </h5>
+
+  {% assign now = "now" | in_time_zone %}
+
+  {% if document.active %}
+    {% assign webshop_status = "active" %}
+  {% else %}
+    {% assign webshop_status = "inactive" %}
+  {% endif %}
+
+  {% assign statuses = "active inactive" | split: " " %}
+
+  {% for status in statuses %}
+
+    {% if status == webshop_status %}
+      {% assign style = "" %}
+    {% else %}
+      {% assign style = "display: none;" %}
+    {% endif %}    
+
+    {% if status == "active" %}
+      {% assign data_active     = "true" %}
+      {% assign active_option   = "false" %}
+      {% assign active_colour   = "success" %}
+    {% else %}
+      {% assign data_active     = "false" %}
+      {% assign active_option   = "true" %}
+      {% assign active_colour   = "danger" %}
+    {% endif %}
+
+    <div class="toggle-active" data-active="{{ data_active }}" style="{{ style }}">
+      <form class="update-webshop-form" action="{{ 'webshops__update' | path_for: id: document._id, format: 'json' }}" method="patch">
+        <p>
+          {% assign created_at = document._id | generation_time | in_time_zone %}
+          {{ l.explainers.active.p1 }}
+          <span title="{{ created_at | i18n_l: 'wday_date_hours_minutes' | capitalize }}">{{ created_at | time_distance_in_words: now }}</span>
+          {{ l.explainers.active.p2 }}
+          <span class="text-{{ active_colour }}"><b>{{ l.explainers.active[status] }}</b></span>.
+          {{ l.explainers.active.p3 }}
+          <input type="hidden" name="active" value="{{ active_option }}">
+          <input type="submit" class="bg-body border-0 link-primary p-0" value="{{ l.explainers.active.active_options[status] }}">.
+        </p>
+      </form>
+    </div>
+  {% endfor %}
+
+  <h5 class="my-4">{{ l.headlines.config }}</h5>
+  <p>
+    {{ l.explainers.config.p1 }}
+    <a href="{{ 'webshops__show' | path_for: id: document._id }}">{{ l.explainers.config.p2 }}</a> &#183; <a href="{{ 'webshops__show' | path_for: id: document._id }}" target="_blank"><i class="fas fa-external-link-alt"></i></a>
+  </p>
+
+  {% assign encrypted_hash = document.config %}
+  {% include "shared/decrypt_hash" %}
+
+  <form class="update-webshop-form mb-4" action="{{ 'webshops__update' | path_for: id: document._id, format: 'json' }}" method="patch">
+
+    <div class="json-container">
+      <textarea class="border" name="config">{{ decrypted_hash | hash_to_json }}</textarea>
+    </div>
+    <div class="d-grid gap-2 mt-3">
+      <input type="submit" class="btn btn-outline-primary" value="{{ l.buttons.submit }}">
+      <button class="btn btn-outline-primary disabled" data-type="submitting" disabled="" style="display: none;">{{ l.buttons.submitting }}</button>
+    </div>
+  </form>
+
+  <h5 class="my-4">{{ l.headlines.reset }}</h5>
+  <p>
+    {{ l.explainers.reset.p1 }} <a href="https://goaddon.com/en/addons/5b9ff6463ab42f43522b30cf/manage#page=integrations&query=%7B%22filter%22%3A%22{{ relay.name | downcase }}%22%7D" target="_blank">{{ relay.name }} <i class="fas fa-external-link-alt"></i></a>. {{ l.explainers.reset.p2 }}.
+  </p>
+
+  <form class="update-webshop-form" action="{{ 'webshops__update' | path_for: id: document._id, format: 'json' }}" method="patch">
+    <table>
+      <tr>
+        <td width="100%">
+          <select name="got_at_attr" class="form-control input-select2 input-select2-got_at_attr">
+            <option value="" label=" "></option>
+            {% for attribute in document %}
+              {% capture got_at %}{{ attribute[0] | slice: 0, 3 }}{{ attribute[0] | slice: -3, 3 }}{% endcapture %}
+              {% if got_at == "got_at" %}
+                {% assign attribute_name = attribute[0] %}
+                {% if attribute[1] != nil %}
+                  {% assign time = attribute[1] | in_time_zone %}
+                  {% capture time_text %}{{ time | time_distance_in_words: now | capitalize }} {{ l.input.ago }}{% endcapture %}
+                {% else %}
+                  {% assign time_text = nil %}
+                {% endif %}
+                <option value="{{ attribute_name }}" data-title="{{ l.attributes[attribute_name] }}" data-time="{{ time_text }}">{{ l.attributes[attribute_name] }}</option>
+              {% endif %}
+            {% endfor %}
+          </select>
+        </td>
+        <td style="vertical-align: top;">
+          <input type="submit" class="btn btn-outline-primary ms-1" value="{{ l.buttons.reset }}">
+          <button class="btn btn-outline-primary ms-1 disabled" data-type="submitting" disabled="" style="display: none;">{{ l.buttons.resetting }}</button>
+        </td>
+      </tr>
+    </table>
+  </form>
+
+  <h5 class="my-4">{{ l.headlines.webhook_token }}</h5>
+  <p>
+    {{ l.explainers.webhook_token.p1 }}
+
+    <a href="#webhook_token" aria-controls="webhook_token" aria-expanded="false" data-bs-toggle="collapse">
+      {{ l.explainers.webhook_token.p2 }} <i class="fas fa-caret-down"></i>
+    </a>
+  </p>
+
+  <div id="webhook_token" class="collapse">
+    <pre>{{ document.webhook_token | decrypt | strip_html }}</pre>
+  </div>
+
+  <h5 class="my-4">{{ l.headlines.tickets }}</h5>
+  <p>
+    {{ l.explainers.new_ticket.p1 }} <a href="{{ 'tickets__new' | path_for: webshop_id: document._id }}">{{ l.explainers.new_ticket.p2 }}</a>.
+    {{ tickets.size }}
+    {% if tickets.size == 1 %}
+      {{ l.explainers.tickets.ticket }}
+    {% else %}
+      {{ l.explainers.tickets.tickets }}
+    {% endif %}
+    {{ l.explainers.tickets.p1 }}.
+  </p>
+
+  {% include "shared/tickets" %}
+
+  {% if document.active %}
+    {% assign danger_zone_style = "display: none;" %}
+  {% else %}
+    {% assign danger_zone_style = "" %}
+  {% endif %}
+
+  <div id="danger_zone" style="{{ danger_zone_style }}">
+    <h5 class="my-4">{{ l.headlines.danger_zone }}</h5>
+
+    <form class="d-inline" action="{{ 'webshops__destroy' | path_for: id: document._id }}" method="post">
+      <input type="hidden" name="_method" value="delete">
+      {{ l.destroy.intro }}
+      <input type="submit" class="bg-body border-0 link-danger p-0" value="{{ l.destroy.button }}" data-title="{{ l.destroy.title }}" data-confirm="{{ l.destroy.confirm }}" data-commit="{{ l.destroy.commit }}" data-cancel="{{ l.destroy.cancel }}" data-commit-class="btn btn-outline-danger" data-cancel-class="text-primary">. {{ l.destroy.outro }}
+    </form>
+  </div>
+
+  {% if document.products_error != nil or document.orders_error != nil or document.customers_error != nil or document.categories_error != nil %}
+    {% if document.products_error.size > 0 or document.orders_error.size > 0 or document.customers_error.size > 0 or document.categories_error.size > 0 %}
+
+      <h5 class="my-4">{{ l.headlines.errors }}</h5>
+
+      {% if document.got_error_at != nil %}
+
+        <p>{{ l.explainers.errors.intro }} <span title="{{ document.got_error_at | in_time_zone | i18n_l: 'wday_date_hours_minutes' | capitalize }}">{{ document.got_error_at | time_distance_in_words: now }}</span> {{ l.explainers.errors.ago }}.</p>
+
+      {% endif %}
+
+      {% assign error_klasses = "categories customers products orders" | split: " " | sort %}
+
+      {% for error_klass in error_klasses %}
+
+        {% capture error_field %}{{ error_klass }}_error{% endcapture %}
+
+        {% if document[error_field] != nil and document[error_field].size > 0 %}
+
+          <p>{{ l.explainers.errors.p1 }} {{ l.explainers.errors[error_klass] }} {{ l.explainers.errors.p2 }}:</p>
+
+          {% assign errors = "" | split: " " %}
+
+          {% for document_error in document[error_field] %}
+
+            {% assign name    = document_error.name | decrypt %}
+            {% assign value   = document_error.value | decrypt %}
+            {% assign error   = nil | new_hash: name: name, value: value %}
+            {% assign errors  = errors | push_to_array: error %}
+
+          {% endfor %}
+
+          <div class="mb-4">
+            <div class="json-pre-container">
+              <div class="json-source" style="display: none;">{{ errors | hash_to_json }}</div>
+              <pre><code></code></pre>
+            </div>
+          </div>
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+  {% endif %}
+{% endif %}

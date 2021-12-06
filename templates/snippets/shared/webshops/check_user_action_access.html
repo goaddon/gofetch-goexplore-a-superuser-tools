@@ -1,0 +1,42 @@
+{% assign error = l.errors.no_access %}
+
+{% if user.superuser_level == 1 %}
+
+  {% assign error = nil %}
+
+{% else %}
+
+  {% assign documents_query = "webshops" | db_find: _id: document_id %}
+  {% assign document        = documents_query.results.first %}
+
+  {% if document != nil %}
+    {% if user.webshop_relay_ids != nil and user.webshop_relay_ids contains document.relay_id %}
+
+      {% assign error = nil %}
+
+    {% else %}
+
+      {% if user.closed_ticket_relay_ids != nil and user.closed_ticket_relay_ids.size > 0 %}
+
+        {% assign permitted_relay_ids = user.closed_ticket_relay_ids %}
+
+      {% elsif user.ticket_relay_ids != nil and user.ticket_relay_ids.size > 0 %}
+
+        {% assign permitted_relay_ids = user.ticket_relay_ids %}
+
+      {% endif %}
+
+      {% if permitted_relay_ids != nil and permitted_relay_ids contains document.relay_id %}
+
+        {% assign ticket_statuses = "opened escalated" | split: " " %}
+        {% assign tickets_query   = "tickets" | db_count: webshop_id: document._id, user_id: user._id, statuses: ticket_statuses %}
+
+        {% if tickets_query.results_count != nil and tickets_query.results_count > 0 %}    
+
+          {% assign error = nil %}
+
+        {% endif %}
+      {% endif %}
+    {% endif %}
+  {% endif %}
+{% endif %}

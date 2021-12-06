@@ -1,0 +1,59 @@
+{% if job_ids != nil and job_ids[participant] != nil %}
+
+  {% assign job_id          = job_ids[participant] %}
+  {% assign container_klass = " text-secondary" %}
+
+{% else %}
+
+  {% assign job_id          = nil %}
+  {% assign container_klass = "" %}
+
+{% endif %}
+
+<span class="border rounded text-nowrap px-1 me-1{{ container_klass }}" data-job-container="{{ job_id }}" data-participant="{{ participant }}">
+  {% if participant contains "@" %}
+
+    {% assign ticket_email = document.email | decrypt %}
+
+    {{ participant }} &#183;
+
+    {% if participant == ticket_email %}
+
+      <b>{{ l.recipients.author }}</b>
+
+    {% elsif app_user_emails contains participant %}
+
+      <b>{{ l.recipients.user }}</b>
+
+    {% elsif unknown_user_emails contains participant %}
+
+      <b>{{ l.recipients.unknown_user }}</b>
+
+    {% endif %}
+
+  {% elsif participant.size == 24 %}
+
+    {% if superusers[participant].email != nil %}
+
+      {{ superusers[participant].email }}
+
+    {% else %}
+
+      {{ participant }} ({{ l.recipients.deleted_superuser }})
+
+    {% endif %}
+
+    &#183; <b>{{ l.recipients.superuser }}</b>
+
+  {% else %}
+
+    <b>{{ l.recipients[participant] }}</b>
+
+  {% endif %}
+
+  {% if job_id != nil %}
+
+    <i class="far fa-question-circle" data-job-error="{{ job_id }}" style="display: none;"></i>
+
+  {% endif %}
+</span>

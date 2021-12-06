@@ -1,0 +1,74 @@
+{% if account != nil and user.superuser %}
+
+  {% assign query = nil | new_hash %}
+
+  {% case params.scope %}
+
+    {% when "closed" %}
+
+      {% assign scope           = "closed" %}
+      {% assign query_statuses  = "closed" | split: " " %}
+
+    {% else %}
+
+      {% assign scope           = "opened" %}
+      {% assign query_statuses  = "opened escalated" | split: " " %}
+
+  {% endcase %}
+
+  {% assign status_q  = nil | new_hash | push_to_hash: "$in", query_statuses %}
+
+  {% if user.superuser_level != 1 %}
+
+    {% if user.closed_ticket_relay_ids != nil and user.closed_ticket_relay_ids.size > 0 %}
+
+      {% assign relay_q   = nil | new_hash | push_to_hash: "$in", user.closed_ticket_relay_ids %}
+      {% assign query     = query | push_to_hash: "relay_id", relay_q %}
+
+    {% elsif scope == "opened" and user.ticket_relay_ids != nil and user.ticket_relay_ids.size > 0 %}
+
+      {% assign relay_q   = nil | new_hash | push_to_hash: "$in", user.ticket_relay_ids %}
+      {% assign query     = query | push_to_hash: "relay_id", relay_q %}
+
+    {% else %}
+
+      {% assign query     = query | push_to_hash: "superuser_id", user._id %}
+
+    {% endif %}
+  {% endif %}
+
+  {% assign query           = query | push_to_hash: "status", status_q %}
+  {% assign documents_query = "tickets" | db_find: query: query, page: params.page, per_page: params.per_page %}
+  {% assign documents       = documents_query.results %}
+
+  {% if documents.size > 0 %}
+
+    {% include "shared/get_gofetch_relays" %}
+
+    {% if error == nil %}
+
+      {% assign company_ids = "" %}
+
+      {% for document in documents %}
+
+        {% if document.company_id != nil %}
+
+          {% capture company_ids %}{{ company_ids }} {{ document.company_id }}{% endcapture %}
+
+        {% endif %}
+
+      {% endfor %}
+
+      {% assign company_ids = company_ids | lstrip | split: " " | uniq %}
+
+      {% if company_ids.size > 0 %}
+
+        {% assign companies_query = "companies" | db_find: company_ids: company_ids %}
+        {% assign companies       = companies_query.results | to_hash: "_id" %}
+
+      {% endif %}
+    {% endif %}
+  {% endif %}
+
+  {% include "tickets" %}
+{% endif %}

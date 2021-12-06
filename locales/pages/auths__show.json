@@ -1,0 +1,9 @@
+{
+  "en": {
+    "title": "Auth",
+    "errors": {
+      "no_access": "You don't have access to this auth",
+      "no_relay_id": "The auth does not belong to a relay"
+    }
+  }
+}

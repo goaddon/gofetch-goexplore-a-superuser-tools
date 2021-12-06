@@ -1,0 +1,33 @@
+{% if user.superuser_level != 1 %}
+
+  {% if user.closed_ticket_relay_ids != nil and user.closed_ticket_relay_ids.size > 0 %}
+
+    {% unless user.closed_ticket_relay_ids contains document.relay_id %}
+
+      {% assign error = l.no_access %}
+
+    {% endunless %}    
+
+  {% else %}
+
+    {% unless user.ticket_relay_ids != nil and user.ticket_relay_ids contains document.relay_id %}
+
+      {% assign error = l.no_access %}
+
+    {% else %}
+
+      {% if document.superuser_id != user._id %}
+
+        {% assign open_statuses = "opened escalated" | split: " " %}
+
+        {% unless open_statuses contains document.status %}
+
+          {% assign error = l.no_access %}
+
+        {% endunless %}
+
+      {% endif %}
+
+    {% endunless %}
+  {% endif %}
+{% endif %}

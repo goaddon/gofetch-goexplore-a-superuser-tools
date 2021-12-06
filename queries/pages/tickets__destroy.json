@@ -1,0 +1,20 @@
+{
+  "tickets": {
+    "klass": "tickets",
+    "query": {
+      "_id": "{{ _id }}"
+    },
+    "projection": {
+      "_id": 1,
+      "superuser_id": 1,
+      "relay_id": 1,
+      "status": 1
+    }
+  },
+  "destroy_ticket": {
+    "klass": "tickets",
+    "query": {
+      "_id": "{{ _id }}"
+    }
+  }
+}

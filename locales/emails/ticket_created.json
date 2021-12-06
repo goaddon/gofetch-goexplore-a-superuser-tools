@@ -1,0 +1,13 @@
+{
+  "en": {
+    "subjects": {
+      "company": "Ticket created by",
+      "auth": "Ticket create by initiator of auth",
+      "ticket": "Ticket created"
+    },
+    "history": {
+      "p1": "You can",
+      "p2": "view the message online"
+    }
+  }
+}

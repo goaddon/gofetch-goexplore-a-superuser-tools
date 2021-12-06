@@ -1,0 +1,13 @@
+{
+  "en": {
+    "subjects": {
+      "company": "Support updated ticket about",
+      "auth": "Support updated the ticket about auth",
+      "ticket": "Support updated ticket"
+    },
+    "history": {
+      "p1": "You can",
+      "p2": "view the message online"
+    }
+  }
+}

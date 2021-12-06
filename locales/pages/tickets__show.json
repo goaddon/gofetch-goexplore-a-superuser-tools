@@ -1,0 +1,10 @@
+{
+  "en": {
+    "title": "Ticket",
+    "errors": {
+      "no_ticket": "No ticket",
+      "wrong_company": "The ticket does not belong to this account",
+      "no_relay_id": "The auth does not belong to a relay"
+    }
+  }
+}

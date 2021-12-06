@@ -1,0 +1,25 @@
+{% if account != nil and user.superuser %}
+
+  {% if user.superuser_level != 1 %}
+
+    {% assign error = l.errors.no_access %}
+
+  {% else %}
+
+    {% assign superusers_query  = "superusers" | db_find: app_id: project.app_id, _id: params.id %}
+    {% assign superuser         = superusers_query.results.first %}
+
+    {% if superuser == nil %}
+
+      {% assign error = l.errors.no_superuser %}
+
+    {% else %}
+
+      {% include "shared/get_gofetch_relays" %}
+
+    {% endif %}
+  {% endif %}
+
+  {% include "superuser" %}
+
+{% endif %}

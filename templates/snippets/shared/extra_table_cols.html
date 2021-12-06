@@ -1,0 +1,7 @@
+{% capture page_name %}table_cols_{{ session.page }}{% endcapture %}
+
+{% if project.secrets[page_name] != nil %}
+
+  {% assign table_cols = project.secrets[page_name] | split: "," %}
+
+{% endif %}

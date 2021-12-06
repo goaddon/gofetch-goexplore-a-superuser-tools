@@ -1,0 +1,17 @@
+{% assign decrypted_hash = nil | new_hash %}
+
+{% for kv in encrypted_hash %}
+
+  {% assign klassname = kv[1] | klassname %}
+
+  {% if klassname == "String" %}
+
+    {% assign decrypted       = kv[1] | decrypt %}
+    {% assign decrypted_hash  = decrypted_hash | push_to_hash: kv[0], decrypted %}
+
+  {% else %}
+
+    {% assign decrypted_hash  = decrypted_hash | push_to_hash: kv[0], kv[1] %}
+
+  {% endif %}
+{% endfor %}

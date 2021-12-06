@@ -1,0 +1,31 @@
+{% assign td_klass = " pb-0 mb-0 border-bottom-0" %}
+<tr>
+  <td class="{{ td_klass }}">
+    <p data-log-entry-id="{{ log_entry.id }}">
+
+      {% assign participant = identifier %}
+      {% include "shared/tickets/message_participant" %}
+
+      {% if log_entry.recipients.size > 0 %}
+        <i class="fas fa-arrow-right"></i>
+
+        {% for participant in log_entry.recipients %}
+
+          {% include "shared/tickets/message_participant" %}
+
+        {% endfor %}
+      {% endif %}
+    </p>
+  </td>
+
+  {% include "shared/tickets/log_entry_time_td" %}
+</tr>
+<tr>
+  <td colspan="2" class="pt-0 mt-0">
+    {% if superusers[identifier] != nil %}
+      <div class="mb-0 markdown border-start border-3 ps-2" data-markdown="{{ log_entry.message | decrypt | strip_html | url_encode }}"></div>
+    {% else %}
+      <div class="mb-0 markdown border-start border-3 ps-2">{{ log_entry.message | decrypt | strip_html | newline_to_br }}</div>
+    {% endif %}
+  </td>
+</tr>

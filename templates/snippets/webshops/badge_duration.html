@@ -1,0 +1,28 @@
+{% assign start         = document.got_started_at | date: "%s" %}
+{% assign end           = document[badge_time] | date: "%s" %}
+{% assign duration_s    = end | minus: start %}
+
+{% if duration_s < 0 %}
+
+  {% assign duration = "" %}
+
+{% else %}
+
+  {% capture duration %} &#183; {{ l.intros[badge_time] }} {% endcapture %}
+
+  {% if duration_s < 60 %}
+
+    {% capture duration %}{{ duration }}{{ duration_s }} {{ l.times.s }}{% endcapture %}
+
+  {% elsif duration_s < 3600 %}
+
+    {% assign duration_m = duration_s | divided_by: 60 %}
+    {% capture duration %}{{ duration }}{{ duration_m }} {{ l.times.m }}{% endcapture %}
+
+  {% else %}
+
+    {% assign duration_h = duration_s | divided_by: 216000 %}
+    {% capture duration %}{{ duration }}{{ duration_h }} {{ l.times.h }}{% endcapture %}
+
+  {% endif %}
+{% endif %}

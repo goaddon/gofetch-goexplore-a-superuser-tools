@@ -1,0 +1,111 @@
+{% if error != nil %}
+  <h5 class="mb-4">
+    {{ l.headlines.error }} <a href="{{ 'auths__index' | path_for: page: params.page, per_page: params.per_page }}">{{ l.headlines.return }} <i class="fas fa-undo"></i></a>
+  </h5>
+  <p class="text-danger">{{ error }}.</p>
+{% else %}
+  <h5 class="mb-4">
+    {{ l.headlines.intro }} <a href="{{ 'auths__index' | path_for: page: params.page, per_page: params.per_page }}">{{ l.headlines.return }} <i class="fas fa-undo"></i></a>
+  </h5>
+
+  <p>
+    {{ l.explainers.intro.p1 }}
+  </p>
+
+  <table class="table mb-0">
+    <tbody>
+      <tr>
+        <td width="1" class="text-nowrap">
+          <b>{{ l.headers.status }}:</b>
+        </td>
+        <td>
+          {% assign ticket_status = ticket.status %}
+
+          {% include "shared/auths/status" %}
+
+          {% if document.status_description != nil and document.status_description != "" %}
+
+            <span class="text-secondary">&#183; {{ document.status_description }}</span>
+
+          {% endif %}
+        </td>
+      </tr>
+      <tr>
+        <td width="1" class="text-nowrap">
+          <b>{{ l.headers.created_at }}:</b>
+        </td>
+        <td>
+          <span title="{{ created_at | i18n_l: 'wday_date_hours_minutes' | capitalize }}">
+            {{ created_at | time_distance_in_words: now | capitalize }} {{ l.informations.ago }}
+          </span>
+        </td>
+      </tr>
+      <tr>
+        <td width="1" class="text-nowrap">
+          <b>{{ l.headers.relay_name }}:</b>
+        </td>
+        <td>
+          {{ relay.name }}
+        </td>
+      </tr>
+      <tr>
+        <td width="1" class="text-nowrap">
+          <b>{{ l.headers.remote_ip }}:</b>
+        </td>
+        <td>
+          {{ document.remote_ip | decrypt }}
+        </td>
+      </tr>
+      <tr>
+        <td width="1" class="text-nowrap">
+          <b>{{ l.headers.interface_link }}:</b>
+        </td>
+        <td>
+          <a href="{{ project.secrets.gofetch_interface_url }}#action=auths__show&auth_id={{ document._id }}" target="_blank">{{ l.links.external_link }} <i class="fas fa-external-link-alt"></i></a>
+        </td>
+      </tr>
+      {% if document.webshop_id != nil %}
+        <tr>
+          <td width="1" class="text-nowrap">
+            <b>{{ l.headers.webshop }}:</b>
+          </td>
+          <td>
+            {% if webshop == nil %}
+              {{ l.informations.unknown_webshop }} <span class="text-secondary border rounded border-secondary px-1">{{ document.webshop_id }}</span>
+            {% else %}
+              {% if webshop.company_id == account._id %}
+                <a href="{{ 'webshops__show' | path_for: id: webshop._id }}">{{ l.links.show_webshop }}</a>
+              {% elsif company != nil %}
+                <form method="post" action="{{ 'accounts__switch' | path_for: id: company._id }}">
+                  <input type="hidden" name="_method" value="patch">
+                  <input type="hidden" name="redirect" value="{{ 'webshops__show' | path_for: id: webshop._id }}">
+                  <input class="bg-body border-0 link-primary p-0" type="submit" value="{{ company.website }}">
+                </form>
+              {% else %}
+                {{ l.informations.unknown_webshop }} <span class="text-secondary border rounded border-secondary px-1">{{ webshop._id }}</span> {{ l.informations.unknown_company }} <span class="text-secondary border rounded border-secondary px-1">{{ webshop.company_id }}</span>
+              {% endif %}
+            {% endif %}
+          </td>
+        </tr>
+      {% endif %}
+    </tbody>
+  </table>
+
+  {% assign auth = document %}
+  {% include "shared/auth_result" %}
+
+  <h5 class="my-4">{{ l.headlines.tickets }}</h5>
+
+  <p>
+    {{ l.explainers.new_ticket.p1 }} <a href="{{ 'tickets__new' | path_for: auth_id: document._id }}">{{ l.explainers.new_ticket.p2 }}</a>.
+    {{ tickets.size }}
+    {% if tickets.size == 1 %}
+      {{ l.explainers.tickets.ticket }}
+    {% else %}
+      {{ l.explainers.tickets.tickets }}
+    {% endif %}
+    {{ l.explainers.tickets.p1 }}.
+  </p>
+
+  {% include "shared/tickets" %}
+{% endif %}

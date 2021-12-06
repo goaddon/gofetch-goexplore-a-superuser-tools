@@ -1,0 +1,24 @@
+{% if account != nil and user.superuser %}
+
+  {% assign document_id = params.id %}
+  {% include "shared/webshops/check_user_action_access" %}
+
+  {% if error != nil %}
+
+    {"error": "{{ error }}"}
+
+  {% else %}
+
+    {% assign job = "destroy_webshop" | create_job: company_id: account._id, webshop_id: document_id %}
+
+    {% if job.job_id == nil %}
+
+      {"error": "{{ l.no_job_id }}"}
+
+    {% else %}
+
+      {"url": "{{ 'destroy_webshop_jobs__show' | path_for: id: job.job_id }}", "message": "{{ l.destroying_webshop }}"}
+
+    {% endif %}
+  {% endif %}
+{% endif %}

@@ -1,0 +1,29 @@
+{
+  "tickets": {
+    "klass": "tickets",
+    "query": {
+      "_id": "{{ _id }}"
+    },
+    "projection": {
+      "_id": 1,
+      "email": 1,
+      "subject": 1,
+      "superuser_id": 1,
+      "relay_id": 1,
+      "status": 1,
+      "token": 1,
+      "log": 1,
+      "company_id": 1,
+      "auth_id": 1
+    }
+  },
+  "update_ticket": {
+    "klass": "tickets",
+    "query": {
+      "_id": "{{ _id }}"
+    },
+    "document": {
+      "$set": "{{ document }}"
+    }
+  }
+}

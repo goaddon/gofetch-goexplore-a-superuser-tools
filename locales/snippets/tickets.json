@@ -1,0 +1,31 @@
+{
+  "en": {
+    "headlines": {
+      "tickets": "Tickets"
+    },
+    "explainers": {
+      "no_tickets": "No tickets..."
+    },
+    "headers": {
+      "company_website": "Company",
+      "relay_name": "Ecommerce platform",
+      "webshop_exists": "Webshop",
+      "opened_at": "Opened",
+      "closed_at": "Closed",
+      "updated_at": "Updated"
+    },
+    "badges": {
+      "no_relay": "NO ECOMMERCE PLATFORM"
+    },
+    "informations": {
+      "no_company_id": "NONE",
+      "no_company": "NOT FOUND",
+      "ago": "ago"
+    },
+    "status_names": {
+      "opened": "Opened",
+      "escalated": "Escalated",
+      "closed": "Closed"
+    }
+  }
+}

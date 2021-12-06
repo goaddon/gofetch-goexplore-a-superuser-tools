@@ -1,0 +1,33 @@
+{
+  "en": {
+    "headlines": {
+      "webshops": "Webshops"
+    },
+    "scope_names": {
+      "active": "Active",
+      "erroring": "Active & erroring",
+      "inactive": "Inactive"
+    },
+    "explainers": {
+      "no_webshops": "No webshops exists"
+    },
+    "headers": {
+      "config": "Identifier",
+      "relay_name": "Ecommerce platform"
+    },
+    "buttons": {
+      "show": "Shop API",
+      "edit": "Edit"
+    },
+    "badges": {
+      "no_relay": "no ecommerce platform",
+      "inactive": "inactive",
+      "reset": "first import",
+      "ticket": "ticket",
+      "tickets": "tickets"
+    },
+    "informations": {
+      "no_identifiable_config_keys": "None"
+    }
+  }
+}

@@ -1,0 +1,6 @@
+{% capture ticket_path %}{{ "tickets__show" | path_for: id: document._id }}{% endcapture %}
+{% if document.company_id != nil %}
+  {% capture superuser_ticket_url %}{{ session.protocol }}{{ session.url }}{{ "accounts__switch" | path_for: id: document.company_id }}?redirect={{ ticket_path | url_encode }}{% endcapture %}
+{% else %}
+  {% capture superuser_ticket_url %}{{ session.protocol }}{{ session.url }}{{ ticket_path }}{% endcapture %}
+{% endif %}

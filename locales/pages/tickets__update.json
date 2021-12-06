@@ -1,0 +1,19 @@
+{
+  "en": {
+    "response_texts": {
+      "no_access": "You don't have access to update this ticket",
+      "superuser_id_updated": "You have reassigned the ticket",
+      "superuser_id_unassigned": "You have unassigned the ticket",
+      "message_saved": "Message saved",
+      "not_found": "The ticket was not found",
+      "not_updated": "The ticket was not updated",
+      "invalid_params": "No valid parameters",
+      "status_changed": {
+        "escalated": "You have escalated the ticket",
+        "de_escalated": "You have de-escalated the ticket",
+        "closed": "You have closed the ticket",
+        "re_opened": "You have re-opened the ticket"
+      }
+    }
+  }
+}

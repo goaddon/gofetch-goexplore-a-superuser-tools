@@ -1,0 +1,30 @@
+{% assign assignable = false %}
+
+{% if superuser[0] != user._id %}
+  {% if superuser[1].superuser_level == 1 %}
+
+    {% assign assignable = true %}
+
+  {% else %}
+
+    {% if superuser[1].closed_ticket_relay_ids != nil and superuser[1].closed_ticket_relay_ids.size > 0 %}
+
+      {% assign permitted_relay_ids = superuser[1].closed_ticket_relay_ids %}
+
+    {% elsif superuser[1].ticket_relay_ids != nil and superuser[1].ticket_relay_ids.size > 0 %}
+
+      {% assign permitted_relay_ids = superuser[1].ticket_relay_ids %}
+
+    {% else %}
+
+      {% assign permitted_relay_ids = nil %}
+
+    {% endif %}
+
+    {% if permitted_relay_ids != nil and permitted_relay_ids contains document.relay_id %}
+
+      {% assign assignable = true %}
+
+    {% endif %}
+  {% endif %}
+{% endif %}

@@ -1,0 +1,36 @@
+{% if params.webshop_id == nil %}
+
+  {"error": "{{ l.no_webshop_id }}"}
+
+{% elsif params.company_id == nil %}
+
+  {"error": "{{ l.no_webshop_id }}"}
+
+{% else %}
+
+  {% assign webshops = "webshops" | db_count: webshop_id: params.webshop_id, company_id: params.company_id %}
+
+  {% if webshops.results_count != 1 %}
+
+    {"error": "{{ l.no_webshop }}"}
+
+  {% else %}
+
+    {% assign customers_deletion          = "destroy_customers" | db_delete_many: webshop_id: params.webshop_id %}
+    {% assign orders_deletion             = "destroy_orders" | db_delete_many: webshop_id: params.webshop_id %}
+    {% assign order_lines_deletion        = "destroy_order_lines" | db_delete_many: webshop_id: params.webshop_id %}
+    {% assign shipments_deletion          = "destroy_shipments" | db_delete_many: webshop_id: params.webshop_id %}
+    {% assign variants_deletion           = "destroy_variants" | db_delete_many: webshop_id: params.webshop_id %}
+    {% assign products_deletion           = "destroy_products" | db_delete_many: webshop_id: params.webshop_id %}
+    {% assign categories_deletion         = "destroy_categories" | db_delete_many: webshop_id: params.webshop_id %}
+    {% assign countries_deletion          = "destroy_countries" | db_delete_many: webshop_id: params.webshop_id %}
+    {% assign delivery_methods_deletion   = "destroy_delivery_methods" | db_delete_many: webshop_id: params.webshop_id %}
+    {% assign payment_methods_deletion    = "destroy_payment_methods" | db_delete_many: webshop_id: params.webshop_id %}
+    {% assign stock_messages_deletion     = "destroy_stock_messages" | db_delete_many: webshop_id: params.webshop_id %}
+    {% assign statuses_deletion           = "destroy_statuses" | db_delete_many: webshop_id: params.webshop_id %}
+    {% assign webshops_deletion           = "webshops" | db_delete_one: webshop_id: params.webshop_id, company_id: params.company_id %}
+
+    {"customers": "{{ customers_deletion.deleted_count }}", "orders": "{{ orders_deletion.deleted_count }}", "order_lines": "{{ order_lines_deletion.deleted_count }}", "shipments": "{{ shipments_deletion.deleted_count }}", "variants": "{{ variants_deletion.deleted_count }}", "products": "{{ products_deletion.deleted_count }}", "categories": "{{ categories_deletion.deleted_count }}", "countries": "{{ countries_deletion.deleted_count }}", "delivery_methods": "{{ delivery_methods_deletion.deleted_count }}", "payment_methods": "{{ payment_methods_deletion.deleted_count }}", "stock_messages": "{{ stock_messages_deletion.deleted_count }}", "statuses": "{{ statuses_deletion.deleted_count }}", "webshops": "{{ webshops_deletion.deleted_count }}"}
+
+  {% endif %}
+{% endif %}

@@ -1,0 +1,12 @@
+{
+  "en": {
+    "headers": {
+      "opened_at": "Opened",
+      "closed_at": "Closed",
+      "status": "Status"
+    },
+    "body": {
+      "ago": "ago"
+    }
+  }
+}

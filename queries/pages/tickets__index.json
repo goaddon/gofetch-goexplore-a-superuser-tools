@@ -1,0 +1,39 @@
+{
+  "tickets": {
+    "klass": "tickets",
+    "query": "{{ query }}",
+    "pagination": {
+      "page": 0,
+      "per_page": 10
+    },
+    "projection": {
+      "_id": 1,
+      "relay_id": 1,
+      "webshop_id": 1,
+      "auth_id": 1,
+      "company_id": 1,
+      "status": 1,
+      "opened_at": 1,
+      "closed_at": 1,
+      "updated_at": 1
+    },
+    "sort": {
+      "updated_at": -1
+    }
+  },
+  "companies": {
+    "klass": "companies",
+    "query": {
+      "_id": {
+        "$in": "{{ company_ids }}"
+      }
+    },
+    "projection": {
+      "_id": 1,
+      "website": 1
+    },
+    "sort": {
+      "_id": -1
+    }
+  }
+}

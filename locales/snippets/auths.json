@@ -1,0 +1,24 @@
+{
+  "en": {
+    "headlines": {
+      "no_auths": "No auths exists",
+      "auths": "Auths"
+    },
+    "headers": {
+      "config": "Identifier",
+      "relay_name": "Ecommerce platform",
+      "status": "Status",
+      "created_at": "Submitted"
+    },
+    "buttons": {
+      "show": "View"
+    },
+    "badges": {
+      "no_relay": "NO ECOMMERCE PLATFORM"
+    },
+    "informations": {
+      "no_identifiable_config_keys": "None",
+      "ago": "ago"
+    }
+  }
+}

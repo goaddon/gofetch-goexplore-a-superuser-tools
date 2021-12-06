@@ -1,0 +1,6 @@
+{
+  "create_ticket": {
+    "klass": "tickets",
+    "document": "{{ document }}"
+  }
+}

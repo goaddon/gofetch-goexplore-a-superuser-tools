@@ -1,0 +1,12 @@
+{
+  "en": {
+    "recipients": {
+      "author": "author",
+      "unknown": "unauthenticated user",
+      "unknown_user": "external user",
+      "user": "user",
+      "superuser": "superuser",
+      "deleted_superuser": "deleted"
+    }
+  }
+}

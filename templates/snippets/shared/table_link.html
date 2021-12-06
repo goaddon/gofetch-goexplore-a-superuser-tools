@@ -1,0 +1,23 @@
+<td class="text-end" width="1">
+  {% if link_path != nil %}
+    {% if company_id == nil or company_id == account._id %}
+      <a href="{{ link_path | path_for: id: document._id, page: documents_query.page, per_page: documents_query.per_page, scope: scope }}" class="d-inline-block text-nowrap">
+        <div class="d-none d-xl-block">
+          {{ link_name }}
+        </div>
+        <i class="{{ link_icon }} d-xl-none"></i>
+      </a>
+    {% else %}
+      <form method="post" action="{{ 'accounts__switch' | path_for: id: company_id }}" class="d-inline-block text-nowrap">
+        <input type="hidden" name="_method" value="patch">
+        <input type="hidden" name="redirect" value="{{ link_path | path_for: id: document._id, page: documents_query.page, per_page: documents_query.per_page, scope: scope }}">
+        <div class="d-none d-xl-block">
+          <input type="submit" value="{{ link_name }}" class="bg-body border-0 link-primary p-0">
+        </div>
+        <div class="d-xl-none">
+          <button type="submit" class="bg-body border-0 link-primary p-0"><i class="text-primary {{ link_icon }}"></i></button>
+        </div>
+      </form>
+    {% endif %}
+  {% endif %}
+</td>

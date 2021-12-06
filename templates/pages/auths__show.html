@@ -1,0 +1,58 @@
+{% if account != nil and user.superuser %}
+
+  {% assign documents_query   = "auths" | db_find: _id: params.id, company_id: account._id %}
+  {% assign document          = documents_query.results.first %}
+
+  {% if document != nil %}
+
+    {% assign now         = "now" | in_time_zone %}
+    {% assign created_at  = document._id | generation_time %}
+
+    {% include "shared/auths/show_auth" %}
+
+    {% unless show_auth %}
+
+      {% assign error = l.errors.no_access %}
+
+    {% else %}
+
+      {% assign tickets_query = "tickets" | db_find: auth_id: document._id %}
+      {% assign tickets       = tickets_query.results %}
+
+      {% if document.webshop_id != nil %}
+
+        {% assign webshops_query  = "webshops" | db_find: _id: document.webshop_id %}
+        {% assign webshop         = webshops_query.results.first %}
+
+        {% if webshop != nil and webshop.company_id != account._id %}
+
+          {% assign companies_query = "companies" | db_find: _id: webshop.company_id %}
+          {% assign company         = companies_query.results.first %}        
+
+        {% endif %}
+
+      {% endif %}
+
+      {% if document.relay_id == nil %}
+
+        {% assign error = l.errors.no_relay_id %}
+
+      {% else %}
+
+        {% include "shared/get_gofetch_relays" %}
+
+        {% if error == nil %}
+
+          {% assign relay_id = document.relay_id %}
+          {% assign relay = relays[relay_id] %}
+
+        {% endif %}
+      {% endif %}
+
+    {% endunless %}
+
+    {% include "auth" %}
+
+  {% endif %}
+
+{% endif %}

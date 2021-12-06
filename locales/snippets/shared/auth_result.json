@@ -1,0 +1,24 @@
+{
+  "en": {
+    "auth_headlines": {
+      "webshop_config": "Configuration",
+      "setup_config": "Setup configuration",
+      "error": "Error",
+      "log": "Log"
+    },
+    "auth_explainers": {
+      "no_data": {
+        "webshop_config": "An empty configuration was applied",
+        "setup_config": "No data was collected",
+        "error": "No errors occurred",
+        "log": "Nothing was logged"
+      },
+      "yes_data": {
+        "webshop_config": "The following configuration was applied",
+        "setup_config": "The following data was collected",
+        "error": "An error occurred",
+        "log": "The following was logged"
+      }
+    }
+  }
+}

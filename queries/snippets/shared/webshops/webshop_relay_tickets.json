@@ -1,0 +1,55 @@
+{
+  "webshops": {
+    "klass": "webshops",
+    "query": {
+      "_id": "{{ _id }}",
+      "company_id": "{{ company_id }}"
+    },
+    "projection": {
+      "_id": 1,
+      "relay_id": 1,
+      "config": 1,
+      "active": 1,
+      "got_started_at": 1,
+      "webhook_token": 1,
+      "got_products_created_since_catch_all_date_at": 1,
+      "got_products_created_since_last_request_at": 1,
+      "got_products_updated_since_catch_all_date_at": 1,
+      "got_products_updated_since_last_request_at": 1,
+      "got_categories_created_since_catch_all_date_at": 1,
+      "got_categories_created_since_last_request_at": 1,
+      "got_categories_updated_since_catch_all_date_at": 1,
+      "got_categories_updated_since_last_request_at": 1,
+      "got_customers_created_since_catch_all_date_at": 1,
+      "got_customers_created_since_last_request_at": 1,
+      "got_customers_updated_since_catch_all_date_at": 1,
+      "got_customers_updated_since_last_request_at": 1,
+      "got_orders_created_since_catch_all_date_at": 1,
+      "got_orders_created_since_last_request_at": 1,
+      "got_orders_updated_since_catch_all_date_at": 1,
+      "got_orders_updated_since_last_request_at": 1,
+      "got_orders_open_since_1x_at": 1,
+      "got_orders_open_since_2x_at": 1,
+      "got_orders_open_since_3x_at": 1,
+      "got_orders_open_since_4x_at": 1,
+      "got_error_at": 1,
+      "products_error": 1,
+      "categories_error": 1,
+      "customers_error": 1,
+      "orders_error": 1
+    }
+  },
+  "tickets": {
+    "klass": "tickets",
+    "query": {
+      "webshop_id": "{{ webshop_id }}"
+    },
+    "projection": {
+      "_id": 1,
+      "status": 1,
+      "opened_at": 1,
+      "closed_at": 1,
+      "superuser_id": 1
+    }
+  }
+}

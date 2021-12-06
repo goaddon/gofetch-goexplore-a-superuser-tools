@@ -1,0 +1,12 @@
+{
+  "update_superuser": {
+    "klass": "users",
+    "query": {
+      "app_id": "{{ app_id }}",
+      "_id": "{{ _id }}"
+    },
+    "document": {
+      "$set": "{{ document }}"
+    }
+  }
+}

@@ -1,0 +1,405 @@
+{% if error != nil %}
+  <h5 class="mb-4">
+    {{ l.headlines.error }} <a href="{{ 'webshops__index' | path_for: page: params.page, per_page: params.per_page, scope: params.scope }}">{{ l.headlines.return }} <i class="fas fa-undo"></i></a>
+  </h5>
+  <p class="text-danger">{{ error }}.</p>
+{% else %}
+  <h5 class="mb-4">
+    {{ l.headlines.intro }} {{ relay.name }}, {{ l.headlines.or }} <a href="{{ 'webshops__index' | path_for: page: params.page, per_page: params.per_page, scope: params.scope }}">{{ l.headlines.return }} <i class="fas fa-undo"></i></a>
+  </h5>
+
+  <p>
+    <samp>
+      <i class="fas fa-terminal"></i>
+      {% for identifiable_config_key in relay.identifiable_config_keys %}
+        {% if identifiable_config_key != relay.identifiable_config_keys.first %}
+          &#183;
+        {% endif %}
+        {{ document.config[identifiable_config_key] | decrypt }}
+      {% endfor %}
+      &#183; <a href="{{ 'webshops__edit' | path_for: id: document._id }}">{{ l.informations.edit }}</a>
+      &#183; <a href="{{ 'webshops__edit' | path_for: id: document._id }}" target="_blank"><i class="fas fa-external-link-alt"></i></a>
+    </samp>
+  </p>
+
+  {% assign resource_names = "" %}
+  {% for endpoint in relay.shop_api.v1.endpoints %}
+    {% if endpoint != relay.shop_api.v1.endpoints.first %}
+      {% capture resource_names %}{{ resource_names }} {% endcapture %}
+    {% endif %}
+    {% capture resource_names %}{{ resource_names }}{{ path[0] }}{% endcapture %}
+  {% endfor %}
+
+  {% assign resource_names  = resource_names | split: " " | sort %}
+  {% assign tab_id          = "debug_tab" %}
+
+  <div class="card">
+    <div class="card-header">
+      <ul class="nav nav-tabs card-header-tabs" id="{{ tab_id }}" role="tablist">
+        {% for klass_endpoints in relay.shop_api.v1.endpoints %}
+          {% assign resource_name = klass_endpoints[0] %}
+          <li class="nav-item">
+            {% if params.resource != nil and params.resource != "" %}
+              {% if params.resource == resource_name %}
+                {% assign active_bool = " active" %}
+                {% assign selected    = "true" %}
+              {% else %}
+                {% assign active_bool = "" %}
+                {% assign selected    = "false" %}
+              {% endif %}              
+            {% else %}
+              {% if klass_endpoints == relay.shop_api.v1.endpoints.first %}
+                {% assign active_bool = " active" %}
+                {% assign selected    = "true" %}
+              {% else %}
+                {% assign active_bool = "" %}
+                {% assign selected    = "false" %}
+              {% endif %}
+            {% endif %}
+            <a class="nav-link resource-tab{{ active_bool }}" id="{{ resource_name }}-tab" data-resource="{{ resource_name }}" data-bs-toggle="tab" href="#{{ resource_name }}" role="tab" aria-controls="{{ resource_name }}" aria-selected="{{ selected }}">
+              {{ l.resource_names[resource_name] }}
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="card-body">
+      <div class="tab-content" id="{{ tab_id }}_content">
+        {% for klass_endpoints in relay.shop_api.v1.endpoints %}
+          {% assign resource_name = klass_endpoints[0] %}
+          {% if params.resource != nil and params.resource != "" %}
+            {% if params.resource == resource_name %}
+              {% assign show_active = " show active" %}
+            {% else %}
+              {% assign show_active = "" %}
+            {% endif %}
+          {% else %}
+            {% if klass_endpoints == relay.shop_api.v1.endpoints.first %}
+              {% assign show_active = " show active" %}
+            {% else %}
+              {% assign show_active = "" %}
+            {% endif %}
+          {% endif %}
+          <div class="tab-pane fade{{ show_active }}" id="{{ resource_name }}" role="tabpanel" aria-labelledby="{{ resource_name }}-tab">
+            {% capture accordion_id %}{{ resource_name }}_accordion{% endcapture %}
+            <div class="accordion" id="{{ accordion_id }}">
+
+              {% for endpoint in klass_endpoints[1] %}
+
+                {% assign endpoint_id = endpoint.url | split: "v1/" | last | replace: "{{ ", "" | replace: " }}", "" | replace: "/", "_" %}
+                {% capture endpoint_id %}{{ endpoint.method }}__{{ endpoint_id }}{% endcapture %}
+
+                {% if resource_name == params.resource %}
+                  {% assign resource_match = true %}
+                {% elsif klass_endpoints == relay.shop_api.v1.endpoints.first %}
+                  {% assign resource_match = true %}
+                {% else %}
+                  {% assign resource_match = false %}
+                {% endif %}
+
+                {% if resource_match and params.endpoint == endpoint_id %}
+                  {% assign show_collapse = " show" %}
+                {% elsif klass_endpoints[1].size == 1 %}
+                  {% assign show_collapse = " show" %}
+                {% else %}
+                  {% assign show_collapse = "" %}
+                {% endif %}
+
+                {% capture heading_id %}heading_{{ endpoint_id }}{% endcapture %}
+                {% capture collapse_id %}collapse_{{ endpoint_id }}{% endcapture %}
+
+                <div class="accordion-item">
+                  <h2 class="accordion-header" id="{{ heading_id }}">
+                    <button class="accordion-button collapsed bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#{{ collapse_id }}" aria-expanded="false" aria-controls="{{ collapse_id }}">
+                      <span class="http-method http-method-{{ endpoint.method }} d-inline-block text-center me-1 rounded">{{ endpoint.method | upcase }}</span>
+                      <samp class="text-body">{{ endpoint.url | split: "v1" | last }}</samp>
+                    </button>
+                  </h2>
+
+                  <div id="{{ collapse_id }}" class="accordion-collapse endpoint-collapse collapse{{ show_collapse }}" aria-labelledby="{{ heading_id }}" data-bs-parent="#{{ accordion_id }}" data-endpoint="{{ endpoint_id }}">
+                    <div class="accordion-body">
+                      <p><b>{{ l.headers.description }}</b></p>
+
+                      {% assign description             = endpoint.description | replace: first_line, '' | strip_html | replace: ' [i fas fa-external-link-alt]', '' | url_encode %}
+                      {% assign first_line              = description | split: "%0A%0A" | first %}
+                      {% assign removable               = first_line | append: "%0A%0A" %}
+                      {% assign expandable_description  = description | replace: removable, "" | replace: first_line, "" %}
+                      {% assign description_id          = nil %}
+
+                      {% if expandable_description != "" %}
+
+                        {% capture description_id %}description_{{ endpoint_id }}{% endcapture %}
+
+                      {% endif %}
+
+                      <p>
+                        {{ first_line | url_decode }}
+
+                        {% if description_id != nil %}
+
+                          <a data-bs-toggle="collapse" href="#{{ description_id }}" role="button" aria-expanded="false" aria-controls="{{ comments_id }}">{{ l.description.link }} <i class="fas fa-caret-down"></i></a>
+
+                        {% endif %}
+                      </p>
+
+                      {% if description_id != nil %}
+
+                        <div class="collapse" id="{{ description_id }}">
+                          <div class="markdown" data-markdown="{{ description | replace: removable, '' }}"></div>
+                        </div>
+
+                      {% endif %}
+
+                      {% if endpoint.comments != nil %}
+
+                        <p><b>{{ l.headers.comments }}</b></p>
+                        {% capture comments_id %}comments_{{ endpoint_id }}{% endcapture %}
+                        <p>{{ relay.author }} {{ l.comments.p1 }} {{ relay.name }} {{ l.comments.p2 }} <a data-bs-toggle="collapse" href="#{{ comments_id }}" role="button" aria-expanded="false" aria-controls="{{ comments_id }}">{{ l.comments.link }} <i class="fas fa-caret-down"></i></a></p>
+                        <div class="collapse" id="{{ comments_id }}">
+                          <div class="markdown mb-3 comments-markdown" data-markdown="{{ endpoint.comments | strip_html | url_encode }}"></div>
+                        </div>
+
+                      {% endif %}
+
+                      <form class="shop-api-form" action="{{ 'shop_api_requests__create' | path_for: format: 'json' }}" method="post">
+                        
+                        {% assign url_parts = endpoint.url | split: " " %}
+
+                        {% if url_parts.size > 1 or endpoint.params != nil and endpoint.params.size > 1 %}
+
+                          <p><b>{{ l.headers.params }}</b></p>
+
+                        {% endif %}
+
+                        <input type="hidden" name="resource_name" value="{{ resource_name }}">
+                        <input type="hidden" name="endpoint_name" value="{{ endpoint.name }}">
+                        <input type="hidden" name="webshop_id" value="{{ document._id }}">
+                        <input type="hidden" name="http_method" value="{{ endpoint.method }}">
+
+                        {% if url_parts.size > 1 %}
+                          {% for url_part in url_parts %}
+                            {% if url_part contains "_id" %}
+                              {% assign klass_part = url_part | replace: "_id", "" %}
+                              {% assign last_chars = resource_name | slice: -3, 3 %}
+                              {% if last_chars == "ies" %}
+                                {% assign singularized_resource_name = resource_name | replace: "ies", "y" %}
+                              {% else %}
+                                {% assign singularized_resource_name = nil %}
+                              {% endif %}
+                              {% if resource_name contains klass_part or singularized_resource_name contains klass_part %}
+                                <p for="document_id">
+                                  {{ l.labels.default_1 }} <code>{% raw %}{{ {% endraw %}{{ url_part }}{% raw %} }}{% endraw %}</code> {{ l.labels.default_2 }}
+                                </p>
+                                {% if url_part == "webshop_id" %}
+                                  <div class="input-group mb-4">
+                                    <input class="form-control" type="text" name="document_id" value="{{ document._id }}" disabled>
+                                  </div>
+                                {% else %}
+                                  <div class="input-group mb-4">
+                                    <input class="form-control" type="text" name="document_id" placeholder="{{ l.placeholders.default_1 }} {{ url_part }} {{ l.placeholders.default_2 }}">
+                                  </div>
+                                {% endif %}
+                              {% endif %}
+                            {% endif %}
+                          {% endfor %}
+                        {% endif %}
+
+                        {% if endpoint.params != nil and endpoint.params.size > 0 %}
+                          {% assign locked_params = false %}
+                          {% assign custom_params = false %}
+                          {% for param in endpoint.params %}
+                            {% if param.key != "webshop_id" %}
+                              {% if param.description == nil %}
+                                {% assign custom_params = true %}
+                              {% else %}
+                                {% assign locked_params = true %}
+                                <div class="markdown" data-markdown="{{ param.description | append: ':' | replace: '.:', ':' | strip_html | url_encode }}" for="{{ param.key }}">{{ param.description }}</div>
+                                <div class="input-group mb-4">
+                                  <input class="form-control" type="text" name="{{ param.key }}" data-type="param" placeholder="{{ l.placeholders.default_1 }} {{ param.key }} {{ l.placeholders.default_2 }}">
+                                  {% if param.description contains "ISO 8601" %}
+                                    <div class="btn-group dropstart">
+                                      <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ l.param_dropdowns.iso_8601_date.button }}</button>
+                                      <ul class="dropdown-menu">
+                                        {% assign numbers = "2 12" | split: " " %}
+
+                                          {% if unit == "days" %}
+                                            <div role="separator" class="dropdown-divider"></div>
+                                          {% endif %}
+
+                                        {% for number in numbers %}
+
+                                          <li>
+                                            <a class="dropdown-item" data-action="date" data-hours="{{ number }}" href="javascript:void(0)">{{ number }} {{ l.param_dropdowns.iso_8601_date.hours }} {{ l.param_dropdowns.iso_8601_date.ago }}</a>
+                                          </li>
+
+                                        {% endfor %}
+
+                                        <div role="separator" class="dropdown-divider"></div>
+
+                                        {% assign numbers = "2 14" | split: " " %}
+
+                                        {% for number in numbers %}
+
+                                          <li>
+                                            <a class="dropdown-item" data-action="date" data-hours="{{ number | times: 24 }}" href="javascript:void(0)">{{ number }} {{ l.param_dropdowns.iso_8601_date.days }} {{ l.param_dropdowns.iso_8601_date.ago }}</a>
+                                          </li>
+
+                                        {% endfor %}
+                                      </ul>
+                                    </div>
+                                  {% endif %}
+                                </div>
+                              {% endif %}
+                            {% endif %}
+                          {% endfor %}
+
+                          {% if custom_params %}
+                            {% capture custom_params_id %}custom_params_{{ endpoint_id }}{% endcapture %}
+                            <p>
+                              {{ l.custom_params.intro }}
+                              {% if locked_params %}
+                                {{ l.custom_params.no_conjunction }}
+                              {% endif %}
+                              <a class="" data-bs-toggle="collapse" href="#{{ custom_params_id }}" role="button" aria-expanded="false" aria-controls="{{ custom_params_id }}">{{ l.custom_params.link }} <i class="fas fa-caret-down"></i></a>
+                            </p>
+                            <div class="collapse" id="{{ custom_params_id }}">
+                              {% for param in endpoint.params %}
+                                {% if param.key != "webshop_id" and param.description == nil %}
+                                  <div><p>{{ l.labels.custom_1 }} <code>{{ param.key | strip_html | url_encode }}</code>:</p></div>
+                                  <div class="input-group mb-4">
+                                    <input class="form-control" type="text" name="{{ param.key }}" data-type="param" placeholder="{{ l.placeholders.default_1 }} {{ param.key }} {{ l.placeholders.default_2 }}">
+                                  </div>
+                                {% endif %}
+                              {% endfor %}
+                            </div>
+                          {% endif %}
+                        {% endif %}
+
+                        {% if endpoint.body_description != nil and endpoint.body_description.size > 0 %}
+
+                          <p><b>{{ l.headers.body }}</b></p>
+
+                          {% capture body_sample_id %}body_{{ endpoint_id }}{% endcapture %}
+                          <p>{{ l.body_sample.intro }} <a class="" data-bs-toggle="collapse" href="#{{ body_sample_id }}" role="button" aria-expanded="false" aria-controls="{{ body_sample_id }}">{{ l.body_sample.link }} <i class="fas fa-caret-down"></i></a></p>
+                          <div class="collapse" id="{{ body_sample_id }}">
+                            <div class="card border-0 mb-3">
+                              <div class="json-pre-container">
+                                <div class="json-source" style="display: none;">{{ endpoint.body_description | hash_to_json }}</div>
+                                <pre><code></code></pre>
+                              </div>
+                            </div>
+                          </div>
+
+                          <p>{{ l.body_sample.reset_intro }} <span class="bg-body border-0 link-primary p-0" style="cursor: pointer;" data-action="template" data-value="{{ endpoint.body_example | hash_to_json | url_encode }}">{{ l.body_sample.reset_button }}</span>{% if endpoint.templates != nil and endpoint.templates.size > 0 %} {{ l.body_sample.reset_outro }}{% endif %}.</p>
+
+                          {% if endpoint.templates != nil and endpoint.templates.size > 0 %}
+
+                            <div class="mb-3">
+
+                              {% assign sorted_templates = endpoint.templates | sort: "title" %}
+
+                              {% for template in sorted_templates %}
+
+                                <span class="btn btn-outline-secondary py-0 px-1 m-1" data-action="template" data-value="{{ template.body | hash_to_json | url_encode }}">{{ template.title }}</span>
+
+                              {% endfor %}
+                            </div>
+                          {% endif %}
+                          <div class="json-container">
+                            <textarea class="border" name="body">{{ endpoint.body_example | hash_to_json }}</textarea>
+                          </div>
+                        {% endif %}
+
+                        <div class="my-4">
+                          <div class="form-check form-switch">
+                            <label class="form-check-label"><input class="form-check-input" type="checkbox" name="unfiltered_response">{{ l.labels.unfiltered_response }}</label>
+                          </div>
+
+                          {% if resource_name != "webshops" %}
+
+                            <div class="form-check form-switch">
+                              <label class="form-check-label"><input class="form-check-input" type="checkbox" name="bypass_db">{{ l.labels.bypass_db }}</label>
+                            </div>
+
+                          {% endif %}
+                        </div>
+
+                        <div class="d-grid gap-2 mt-3">
+                          <input class="btn btn-outline-primary" type="submit" value="{{ l.buttons.submit }}">
+                          <button class="btn btn-outline-primary disabled" data-type="submitting" disabled="" style="display: none;">{{ l.buttons.submitting }}</button>
+                        </div>
+                        
+                        <p class="mt-1"><small><b class="px-1 border rounded border-warning bg-warning">{{ l.caution.intro }}</b> {{ l.caution.message }}</small></p>
+
+                        <div class="response-container mt-4">
+                          <pre style="display: none;"><code class="language-json"></code></pre>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  {% if tickets.size > 0 %}
+
+    {% assign toggle_klass      = "" %}
+    {% assign open_ticket_count = 0 %}
+
+    {% for ticket in tickets %}
+      {% if ticket.status == "opened" or ticket.status == "escalated" %}
+
+        {% assign toggle_klass      = " show" %}
+        {% assign open_ticket_count = open_ticket_count | plus: 1 %}
+
+      {% endif %}
+    {% endfor %}
+
+    <div class="accordion mt-4" id="tickets_accordion">
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="card_tickets">
+          <button aria-controls="collapse_card_tickets" aria-expanded="false" class="accordion-button link-primary collapsed bg-light" data-bs-target="#collapse_card_tickets" data-bs-toggle="collapse" type="button">
+
+            {{ tickets.size }}
+
+            {% if tickets.size == open_ticket_count %}
+
+              {{ l.headlines.open }}
+
+            {% endif %}
+
+            {% if tickets.size == 1 %}
+
+              {{ l.headlines.ticket }}
+
+            {% else %}
+
+              {{ l.headlines.tickets }}
+
+            {% endif %}
+
+            {% if tickets.size != open_ticket_count %}
+
+              &#183; {{ open_ticket_count }} {{ l.headlines.open }}
+
+            {% endif %}
+          </button>
+        </h2>
+
+        <div aria-labelledby="card_tickets" class="accordion-collapse collapse{{ toggle_klass }}" data-bs-parent="#tickets_accordion" id="collapse_card_tickets">
+          <div class="accordion-body">
+
+            {% assign now = "now" | in_time_zone %}
+
+            {% include "shared/tickets" %}
+
+          </div>
+       </div>
+    </div>
+  {% endif %}
+{% endif %}

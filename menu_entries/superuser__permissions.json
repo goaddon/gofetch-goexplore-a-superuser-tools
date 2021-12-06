@@ -1,0 +1,15 @@
+{
+  "title": {
+    "en": "Permissions"
+  },
+  "paths": [
+    {
+      "controller": "permissions",
+      "action": "index"
+    },
+    {
+      "controller": "superusers",
+      "action": "show"
+    }
+  ]
+}

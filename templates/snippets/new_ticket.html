@@ -1,0 +1,53 @@
+{% if error != nil %}
+  <h5 class="mb-4">
+    {{ l.headlines.error }} <a href="{{ return_path | path_for: id: klass_id }}">{{ l.headlines.return }} <i class="fas fa-undo"></i></a>
+  </h5>
+  <p class="text-danger">{{ error }}.</p>
+{% else %}
+  <h5 class="mb-4">
+    {{ l.headlines.intro }} <a href="{{ return_path | path_for: id: klass_id }}">{{ l.headlines.return }} <i class="fas fa-undo"></i></a>
+  </h5>
+
+  <p>{{ l.explainers.p1 }}</p>
+
+  <form action="{{ 'tickets__create' | path_for }}" method="post">
+    <div class="mb-3">
+
+      {% assign field_names = "email phone admin_url admin_username admin_password" | split: " " %}
+
+      {% for field_name in field_names %}
+
+        {% include "new_ticket/input" %}
+
+      {% endfor %}
+
+      <b><label for="comments">{{ l.labels.comments }}:</label></b>
+      <textarea class="form-control" id="comments" name="comments" placeholder="{{ l.placeholders.comments }}" rows="2" onkeyup="textAreaAdjust(this)" onpaste="textAreaAdjust(this)" style="overflow:hidden;resize:none;"></textarea>
+    </div>
+
+    <div class="mb-4">
+      <a href="#extra_fields" aria-controls="explainers" aria-expanded="false" data-bs-toggle="collapse">
+        {{ l.buttons.extra_fields }} <i class="fas fa-caret-down"></i>
+      </a>
+
+      <div id="extra_fields" class="collapse pt-3">
+
+        {% assign field_names = "ftp_host ftp_username ftp_password ssh_address ssh_password" | split: " " %}
+
+        {% for field_name in field_names %}
+
+          {% include "new_ticket/input" %}
+
+        {% endfor %}
+
+      </div>
+    </div>
+
+    <input type="hidden" name="{{ klass_name }}" value="{{ document._id }}">
+    <input type="hidden" name="relay_id" value="{{ document.relay_id }}">
+    <input type="hidden" name="company_id" value="{{ document.company_id }}">
+    <div class="d-grid gap-2">
+      <input class="btn btn-outline-primary" type="submit" value="{{ l.buttons.create }}">
+    </div>
+  </form>
+{% endif %}

@@ -1,0 +1,7 @@
+{% if params.subject != nil %}{{ params.subject }}{% else %}{{ l.subject.intro }} {% if params.account != nil %}{{ params.account.website }}{% else %}{{ l.subject.ticket }} {{ params.ticket_id }}{% endif %}{% endif %}
+{{ params.message }}
+{% if params.ticket_url != nil %}
+  <p>
+    {{ l.history.p1 }} <a href="{{ params.ticket_url }}">{{ l.history.p2 }}</a>.
+  </p>
+{% endif %}

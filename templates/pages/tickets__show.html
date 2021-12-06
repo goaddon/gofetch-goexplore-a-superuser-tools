@@ -1,0 +1,60 @@
+{% if account != nil and user.superuser %}
+
+  {% assign error           = nil %}
+  {% assign documents_query = "tickets" | db_find: _id: params.id %}
+  {% assign document        = documents_query.results.first %}
+
+  {% if document == nil %}
+
+    {% assign error = l.errors.no_ticket %}
+
+  {% elsif document.company_id != nil and document.company_id != "" and document.company_id != account._id %}
+
+    {% assign error = l.wrong_company %}
+
+  {% else %}
+
+    {% include "shared/tickets/check_user_access" %}
+
+    {% if error == nil and document.auth_id != nil %}
+
+      {% assign auths_query = "auths" | db_find: _id: document.auth_id %}
+      {% assign auth        = auths_query.results.first %}
+
+    {% endif %}
+
+    {% if error == nil %}
+
+      {% if document.relay_id == nil %}
+
+        {% assign error = l.errors.no_relay_id %}
+
+      {% else %}
+
+        {% include "shared/get_gofetch_relays" %}
+
+        {% if error == nil %}
+
+          {% assign relay_id  = document.relay_id %}
+          {% assign relay     = relays[relay_id] %}
+
+          {% include "shared/tickets/users" %}
+
+          {% assign document_email = document.email | decrypt %}
+
+          <script>
+            var app_user_emails = {{ app_user_emails | hash_to_json }};
+            var unknown_user_emails = {{ unknown_user_emails | hash_to_json }};
+            var superuser_emails = {{ superuser_emails | hash_to_json }};
+            var relay_author = "{{ relay.author }}";
+            var relay_name = "{{ relay.name }}";
+            var document_email = "{{ document_email }}";
+          </script>
+
+        {% endif %}
+      {% endif %}
+    {% endif %}
+  {% endif %}
+
+  {% include "ticket" %}
+{% endif %}

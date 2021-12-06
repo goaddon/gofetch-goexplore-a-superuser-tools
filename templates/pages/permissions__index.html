@@ -1,0 +1,12 @@
+{% if account != nil and user.superuser %}
+
+  {% if user.superuser_level == 1 %}
+
+    {% assign superusers_query = "superusers" | db_find: app_id: project.app_id %}
+    {% assign superusers       = superusers_query.results %}
+
+  {% endif %}
+
+  {% include "permissions" %}
+
+{% endif %}

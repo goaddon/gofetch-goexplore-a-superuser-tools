@@ -1,0 +1,54 @@
+{
+  "en": {
+    "webshops": {
+      "show": {
+        "flash": {
+          "submitting_request": "Please wait until your previous request has been processed."
+        }
+      },
+      "edit": {
+        "messages": {
+          "internal_error": "Internal error"
+        },
+        "placeholders": {
+          "got_at_attr": "Select timestamp to reset..."
+        }
+      }
+    },
+    "tickets": {
+      "show": {
+        "mail_job": {
+          "erred": "Could not send email. Hover the red question mark for details.",
+          "unresolved": "Can not check if email was send.",
+          "unexpected_error": "Unexpected error. Hover the red question mark for details."
+        },
+        "flash": {
+          "copied": "Copied"
+        },
+        "recipients": {
+          "label": "Recipients",
+          "placeholder": "Select recipients from the list or type in email addresses...",
+          "author": "author",
+          "app_user": "user",
+          "unknown_user": "external user",
+          "superuser": "superuser",
+          "relay": "support"
+        }
+      }
+    },
+    "superusers": {
+      "permissions": {
+        "placeholders": {
+          "select": "Select ecommerce platforms..."
+        }
+      }
+    },
+    "destroy_webshop_jobs": {
+      "show": {
+        "statuses": {
+          "erred": "The job errred."
+        }
+      }
+    }
+  }
+}

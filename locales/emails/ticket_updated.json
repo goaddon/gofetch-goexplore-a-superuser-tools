@@ -1,0 +1,13 @@
+{
+  "en": {
+    "subjects": {
+      "company": "Ticket updated by",
+      "auth": "Ticket updated by initiator of auth",
+      "ticket": "Ticket updated"
+    },
+    "history": {
+      "p1": "You can",
+      "p2": "view the message online"
+    }
+  }
+}

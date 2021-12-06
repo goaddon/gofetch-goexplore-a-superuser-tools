@@ -1,0 +1,26 @@
+<span class="border rounded text-nowrap px-1 text-{{ badge_style }} border-{{ badge_style }}" title="{{ document[badge_time] | in_time_zone | i18n_l: 'wday_date_hours_minutes' }}">
+  {% assign from    = document[badge_time] | date: "%s" %}
+  {% assign seconds = to | minus: from %}
+
+  {% if seconds < 60 %}
+
+    {{ seconds }} {{ l.times.seconds }}
+
+  {% elsif seconds < 3600 %}
+
+    {% assign minutes = seconds | divided_by: 60 %}
+
+    {% if minutes < 60 %}
+
+      {{ minutes }} {{ l.times.minutes }}
+
+    {% endif %}
+
+  {% else %}
+
+     {{ document[badge_time] | time_distance_in_words: now | replace: "hours", l.times.hours | replace: "hour", l.times.hours| replace: "days", l.times.days | replace: "day", l.times.days | replace: "weeks", l.times.weeks | replace: "week", l.times.weeks | replace: "months", l.times.months | replace: "month", l.times.months | replace: "years", l.times.years | replace: "year", l.times.years }}
+
+  {% endif %}
+
+  {{ l.informations.ago }}{{ duration }}
+</span>

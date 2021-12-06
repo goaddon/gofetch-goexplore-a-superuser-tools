@@ -1,0 +1,31 @@
+{% assign cache_key = "gofetch_relays" %}
+{% assign relays    = cache_key | fetch_from_cache %}
+
+{% if relays == nil %}
+
+  {% assign gofetch_project_api_token = project.secrets.gofetch_project_api_token %}
+
+  {% if gofetch_project_api_token == nil %}
+
+    {% assign error = l.no_gofetch_project_api_token %}
+
+  {% else %}
+
+    {% assign relay_response = "relays" | webhook: gofetch_project_api_token: gofetch_project_api_token, zone: session.zone %}
+
+    {% if relay_response.error != nil %}
+
+      {% capture error %}{{ l.project_api_error }}: {{ relay_response.error }}{% endcapture %}
+
+    {% elsif relay_response.code != 200 %}
+
+      {% capture error %}{{ l.relays_not_found }} {{ relay_response.code }}: {{ relay_response.body }}{% endcapture %}
+
+    {% else %}
+
+      {% assign relays = relay_response.body.documents | to_hash: "_id" %}
+      {% assign cached = cache_key | write_to_cache: relays, 10 %}
+
+    {% endif %}
+  {% endif %}
+{% endif %}

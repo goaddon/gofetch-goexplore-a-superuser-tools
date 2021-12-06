@@ -1,0 +1,41 @@
+{
+  "tickets": {
+    "klass": "tickets",
+    "query": {
+      "_id": "{{ ticket_id }}"
+    },
+    "projection": {
+      "_id": 1,
+      "subject": 1,
+      "superuser_id": 1,
+      "relay_id": 1,
+      "company_id": 1,
+      "auth_id": 1
+    }
+  },
+  "companies": {
+    "klass": "companies",
+    "query": {
+      "_id": "{{ company_id }}"
+    },
+    "projection": {
+      "_id": 1,
+      "website": 1
+    }
+  },
+  "superusers": {
+    "klass": "users",
+    "query": {
+      "app_id": "{{ app_id }}",
+      "superuser": true
+    },
+    "projection": {
+      "_id": 1,
+      "email": 1,
+      "superuser_level": 1,
+      "ticket_relay_ids": 1,
+      "closed_ticket_relay_ids": 1,
+      "notification_relay_ids": 1
+    }
+  }
+}

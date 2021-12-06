@@ -1,0 +1,6 @@
+{
+  "en": {
+    "ticket_created": "You have created the ticket",
+    "ticket_not_created": "Internal error, the ticket could not be created"
+  }
+}

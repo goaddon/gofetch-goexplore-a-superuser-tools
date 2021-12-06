@@ -1,0 +1,130 @@
+<h5 class="mb-4">{{ l.headlines.tickets }}</h5>
+
+{% if error != nil %}
+
+  <p class="text-danger">{{ error }}.</p>
+
+{% else %}
+
+  {% include "shared/extra_table_cols" %}
+
+  {% assign now           = "now" | in_time_zone %}
+  {% assign status_names  = "opened closed" | split: " " %}
+
+  <div class="card mb-4">
+    <div class="card-header">
+      <ul class="nav nav-tabs card-header-tabs">
+        {% for status_name in status_names %}
+          <li class="nav-item">
+            {% if status_name == scope %}
+              {% assign active_bool = " active" %}
+            {% else %}
+              {% assign active_bool = "" %}
+            {% endif %}
+            <a class="nav-link{{ active_bool }}" href="{{ 'tickets__index' | path_for: scope: status_name }}">
+              {{ l.status_names[status_name] }}
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="card-body">
+
+      {% if documents.size == 0 %}
+
+        <p>{{ l.explainers.no_tickets }}</p>
+
+      {% else %}
+        {% capture time_key %}{{ scope }}_at{% endcapture %}
+        <table class="table">
+          <thead>
+            <tr>
+              <th class="border-0">{{ l.headers.company_website }}</th>
+              <th class="border-0">{{ l.headers.relay_name }}</th>
+              <th class="border-0">
+                {{ l.headers[time_key] }}
+              </th>
+              <th class="border-0">
+                {{ l.headers.updated_at }}
+              </th>
+              <th class="border-0"></th>
+              {% include "shared/extra_table_ths" %}
+              <th class="border-0"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for document in documents %}
+              {% assign relay_id    = document.relay_id %}
+              {% assign company_id  = document.company_id %}
+              <tr>
+                <td>
+                  {% if company_id == account._id %}
+                    {{ companies[company_id].website }}
+                  {% else %}
+                    {% if company_id == nil %}
+                      <span class="text-secondary"><b>{{ l.informations.no_company_id }} <i class="fas fa-minus-circle"></i></b></span>
+                    {% elsif companies[company_id] == nil %}
+                      <span class="text-danger"><b>{{ l.informations.no_company }} <i class="fas fa-minus-circle"></i></b></span>
+                    {% else %}
+                      <form method="post" action="{{ 'accounts__switch' | path_for: id: company_id }}">
+                        <input type="hidden" name="_method" value="patch">
+                        <input type="hidden" name="redirect" value="{{ 'webshops__index' | path_for }}">
+                        <input class="bg-body border-0 link-primary p-0" type="submit" value="{{ companies[company_id].website }}">
+                      </form>
+                    {% endif %}
+                  {% endif %}
+                </td>
+                <td>
+                  {% if relays[relay_id] == nil %}
+                    <span class="badge badge-danger">{{ l.badges.no_relay }}</span>
+                  {% else %}
+                    {% if document.webshop_id == nil or companies[company_id] == nil %}
+                      {{ relays[relay_id].name }}
+                    {% else %}
+                      {% if company_id == account._id %}
+                        <a href="{{ 'webshops__edit' | path_for: id: document.webshop_id }}">{{ relays[relay_id].name }}</a>
+                      {% else %}
+                        <form method="post" action="{{ 'accounts__switch' | path_for: id: company_id }}">
+                          <input type="hidden" name="_method" value="patch">
+                          <input type="hidden" name="redirect" value="{{ 'webshops__edit' | path_for: id: document.webshop_id }}">
+                          <input class="bg-body border-0 link-primary p-0" type="submit" value="{{ relays[relay_id].name }}">
+                        </form>
+                      {% endif %}
+                    {% endif %}
+                  {% endif %}
+                </td>
+                <td>
+                  <span title="{{ document[time_key] | i18n_l: 'wday_date_hours_minutes' | capitalize }}">
+                    {{ document[time_key] | time_distance_in_words: now | capitalize }} {{ l.informations.ago }}
+                  </span>
+                </td>
+                <td>
+                  {% if scope != "opened" or document.updated_at != document.created_at %}
+                    <span title="{{ document.updated_at | i18n_l: 'wday_date_hours_minutes' | capitalize }}">
+                      {{ document.updated_at | time_distance_in_words: now | capitalize }} {{ l.informations.ago }}
+                    </span>
+                  {% endif %}
+                </td>
+                {% assign ticket_status = document.status %}
+                {% assign link_path     = "tickets__show" %}
+                {% assign link_name     = l.status_names[ticket_status] %}
+                {% assign link_icon     = "fas fa-wrench" %}
+
+                {% include "shared/table_link" %}
+                {% include "shared/extra_table_links" %}
+                <td class="text-end text-nowrap" width="1">
+                  <form method="post" action="{{ 'tickets__destroy' | path_for: id: document._id }}">
+                    <input type="hidden" name="_method" value="delete">
+                    <button type="submit" class="bg-body border-0 link-danger p-0"><i class="fas fa-trash text-danger"></i></button>
+                  </form>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% endif %}
+    </div>
+  </div>
+
+  {% include "shared/pagination" %}
+{% endif %}

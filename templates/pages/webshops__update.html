@@ -1,0 +1,69 @@
+{% if account != nil and user.superuser %}
+
+  {% assign document_id = params.id %}
+  {% include "shared/webshops/check_user_action_access" %}
+
+  {% if error != nil %}
+
+    {"status": "422", "error": "{{ error }}"}
+
+  {% else %}
+
+    {% if params.config != nil %}
+
+      {% assign config = nil | new_hash %}
+
+      {% for kv in params.config %}
+
+        {% assign klassname = kv[1] | klassname %}
+
+        {% if klassname == "String" %}
+
+          {% assign encrypted = kv[1] | encrypt %}
+          {% assign config    = config | push_to_hash: kv[0], encrypted %}
+
+        {% else %}
+
+          {% assign config    = config | push_to_hash: kv[0], kv[1] %}
+
+        {% endif %}
+      {% endfor %}
+
+      {% assign webshops_update = "update_config" | db_update_one: company_id: account._id, _id: params.id, config: config %}
+
+    {% elsif params.got_at_attr != nil %}
+
+      {% capture got_at %}{{ params.got_at_attr | slice: 0, 3 }}{{ params.got_at_attr | slice: -3, 3 }}{% endcapture %}
+
+      {% if got_at == "got_at" %}
+
+        {% assign document = nil | new_hash | push_to_hash: params.got_at_attr, nil %}
+
+        {% assign webshops_update = "reset_got_at_attr" | db_update_one: company_id: account._id, _id: params.id, document: document %}
+
+      {% endif %}
+
+    {% elsif params.active == "true" or params.active == "false" %}
+
+      {% if params.active == "true" %}
+        {% assign active = true %}
+      {% else %}
+        {% assign active = false %}
+      {% endif %}
+
+      {% assign webshops_update = "toggle_active" | db_update_one: company_id: account._id, _id: params.id, active: active %}
+    {% endif %}
+
+    {% if webshops_update == nil %}
+      {"status": "422", "error": "{{ l.response_texts.invalid_params }}"}
+    {% else %}
+      {% if webshops_update.matched_count != 1 %}
+        {"status": "422", "error": "{{ l.response_texts.not_found }}"}
+      {% elsif webshops_update.updated_count != 1 %}
+        {"status": "200", "message": "{{ l.response_texts.not_updated }}"}
+      {% else %}
+        {"status": "200", "success": "{{ l.response_texts.updated }}"}
+      {% endif %}
+    {% endif %}
+  {% endif %}
+{% endif %}

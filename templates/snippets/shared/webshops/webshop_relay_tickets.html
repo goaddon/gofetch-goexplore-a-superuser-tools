@@ -1,0 +1,29 @@
+{% assign documents_query = "webshops" | db_find: _id: params.id, company_id: account._id %}
+{% assign document        = documents_query.results.first %}
+
+{% if document == nil %}
+
+  {% assign error = l.no_webshop %}
+
+{% else %}
+
+  {% if document.relay_id == nil %}
+
+    {% assign error = l.errors.no_relay_id %}
+
+  {% else %}
+
+    {% include "shared/get_gofetch_relays" %}
+
+    {% if error == nil %}
+
+      {% assign relay_id      = document.relay_id %}
+      {% assign relay         = relays[relay_id] %}
+      {% assign tickets_query = "tickets" | db_find: webshop_id: document._id %}
+      {% assign tickets       = tickets_query.results %}
+
+      {% include "shared/webshops/check_user_access" %}
+
+    {% endif %}
+  {% endif %}
+{% endif %}

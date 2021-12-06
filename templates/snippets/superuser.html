@@ -1,0 +1,73 @@
+{% if error != nil %}
+
+  <h5 class="mb-4">
+    {{ l.headlines.error }} <a href="{{ 'permissions__index' | path_for }}">{{ l.headlines.return }} <i class="fas fa-undo"></i></a>
+  </h5>
+  <p class="text-danger">{{ error }}.</p>
+
+{% else %}
+
+  <h5 class="mb-4">
+    {{ l.headlines.intro }} {{ superuser.email }} {{ l.headlines.or }} <a href="{{ 'permissions__index' | path_for }}">{{ l.headlines.return }} <i class="fas fa-undo"></i></a>
+  </h5>
+
+  <p class="mb-5">
+    <i>{{ l.explainers.intro.p1 }}</i>
+  </p>
+
+  {% if superuser.superuser_level == 1 %}
+
+    {% assign permission_types = "notification_relay_ids" | split: " " %}
+
+  {% else %}
+
+    {% assign permission_types = "webshop_relay_ids ticket_relay_ids closed_ticket_relay_ids notification_relay_ids auth_relay_ids" | split: " " %}
+
+  {% endif %}
+
+  {% for permission_type in permission_types %}
+
+    <p class="mt-3">
+      <b>{{ l.headers[permission_type] }}</b>
+    </p>
+    {% for p in l.explainers[permission_type] %}
+      <p>
+        {{ p[1] }}
+      </p>
+    {% endfor %}
+
+    <form action="{{ 'superusers__update' | path_for: id: superuser._id, format: 'js' }}" method="post" data-remote="true">
+      <table>
+        <tr>
+          <td width="100%">
+            <div class="mb-3">
+              <select name="{{ permission_type }}[]" class="form-control input-select2-permissions" multiple id="{{ permission_type }}">
+
+                {% if superuser[permission_type] != nil %}
+                  {% for relay_id in superuser[permission_type] %}
+
+                    <option value="{{ relay_id }}" selected>{{ relays[relay_id].name }}</option>
+
+                  {% endfor %}
+                {% endif %}
+
+                {% for relay in relays %}
+                  {% unless superuser[permission_type] != nil and superuser[permission_type] contains relay[0] %}
+
+                    <option value="{{ relay[0] }}">{{ relay[1].name }}</option>
+
+                  {% endunless %}
+                {% endfor %}
+              </select>
+            </div>
+          </td>
+          <td style="vertical-align: top;">
+            <input type="hidden" name="_method" value="patch">
+            <input type="hidden" name="permission_type" value="{{ permission_type }}">
+            <input type="submit" class="btn btn-outline-primary ms-1" value="{{ l.buttons.update }}">
+          </td>
+        </tr>
+      </table>
+    </form>
+  {% endfor %}
+{% endif %}

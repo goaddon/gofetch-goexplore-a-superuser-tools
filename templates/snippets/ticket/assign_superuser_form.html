@@ -1,0 +1,3 @@
+<form action="{{ 'tickets__update' | path_for: id: document._id, format: 'js' }}" method="patch" data-remote="true">
+  <input type="hidden" name="superuser_id" value="{{ superuser._id }}"><input type="submit" class="px-3 btn btn-link" value="{{ superuser.email }}">
+</form>

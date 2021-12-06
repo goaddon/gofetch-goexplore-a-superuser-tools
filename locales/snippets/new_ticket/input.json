@@ -1,0 +1,28 @@
+{
+  "en": {
+    "labels": {
+      "email": "Email",
+      "phone": "Phone",
+      "admin_url": "Admin URL",
+      "admin_username": "Admin username",
+      "admin_password": "Admin password",
+      "ftp_host": "FTP host",
+      "ftp_username": "FTP username",
+      "ftp_password": "FTP password",
+      "ssh_address": "SSH address",
+      "ssh_password": "SSH password"
+    },
+    "placeholders": {
+      "email": "E.g. example@example.com",
+      "phone": "E.g. +4512345678",
+      "admin_url": "E.g. https://example.com/admin",
+      "admin_username": "E.g. Admin",
+      "admin_password": "E.g. 12345678",
+      "ftp_host": "E.g. ftp.example.com",
+      "ftp_username": "E.g. Admin",
+      "ftp_password": "E.g. 12345678",
+      "ssh_address": "E.g. ssh@example.com",
+      "ssh_password": "E.g. 1234"
+    }
+  }
+}

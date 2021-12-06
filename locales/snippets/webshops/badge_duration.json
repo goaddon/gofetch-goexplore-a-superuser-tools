@@ -1,0 +1,13 @@
+{
+  "en": {
+    "intros": {
+      "got_finished_at": "in",
+      "got_error_at": "after"
+    },
+    "times": {
+      "s": "s",
+      "m": "m",
+      "h": "h"
+    }
+  }
+}

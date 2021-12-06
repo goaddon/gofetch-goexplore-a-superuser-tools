@@ -1,0 +1,9 @@
+{
+  "en": {
+    "opened": "Opened",
+    "closed": "Closed",
+    "escalated": "Escalated",
+    "de_escalated": "De-escalated",
+    "re_opened": "Re-opened"
+  }
+}

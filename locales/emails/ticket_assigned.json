@@ -1,0 +1,13 @@
+{
+  "en": {
+    "subjects": {
+      "company": "assigned you to ticket about",
+      "auth": "assigned you to ticket about auth",
+      "ticket": "assigned you to ticket"
+    },
+    "history": {
+      "p1": "You can",
+      "p2": "view the message online"
+    }
+  }
+}

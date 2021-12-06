@@ -1,0 +1,27 @@
+{% if account != nil and user.superuser %}
+
+  {% assign documents_query   = "auths" | db_find: _id: params.id, company_id: account._id %}
+  {% assign document          = documents_query.results.first %}
+
+  {% if document != nil %}
+
+    {% assign now         = "now" | in_time_zone %}
+    {% assign created_at  = document._id | generation_time %}
+
+    {% include "shared/auths/show_auth" %}
+
+    {% unless show_auth %}
+
+      {"error": "{{ l.response_texts.no_access }}"}
+
+    {% else %}
+
+      {% assign tickets_deletion = "destroy_auth" | db_delete_one: _id: document._id %}
+
+      {"message": "{{ l.response_texts.destroyed_auth }}"}
+
+    {% endunless %}
+
+  {% endif %}
+
+{% endif %}

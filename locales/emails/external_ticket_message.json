@@ -1,0 +1,12 @@
+{
+  "en": {
+    "subject": {
+      "intro": "You have received a new message regarding",
+      "ticket": "conversation"
+    },
+    "history": {
+      "p1": "To view the entire conversation history or to send us a message, please",
+      "p2": "click here"
+    }
+  }
+}

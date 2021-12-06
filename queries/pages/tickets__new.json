@@ -1,0 +1,23 @@
+{
+  "webshops": {
+    "klass": "webshops",
+    "query": {
+      "_id": "{{ _id }}"
+    },
+    "projection": {
+      "_id": 1,
+      "relay_id": 1,
+      "company_id": 1
+    }
+  },
+  "auths": {
+    "klass": "auths",
+    "query": {
+      "_id": "{{ _id }}"
+    },
+    "projection": {
+      "_id": 1,
+      "relay_id": 1
+    }
+  }
+}

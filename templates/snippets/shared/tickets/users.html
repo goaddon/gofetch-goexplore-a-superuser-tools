@@ -1,0 +1,33 @@
+{% assign superusers_query    = "superusers" | db_find: app_id: project.app_id %}
+{% assign superusers          = superusers_query.results | to_hash: "_id" %}
+
+{% assign superuser_emails    = "" | split: " " %}
+
+{% for superuser in superusers %}
+
+  {% assign superuser_emails = superuser_emails | push_to_array: superuser[1].email %}
+
+{% endfor %}
+
+{% assign app_user_emails     = "" | split: " " %}
+{% assign unknown_user_emails = "" | split: " " %}
+
+{% if document.company_id == account._id %}
+
+  {% assign account_users_query = "account_users" | db_find: company_id: account._id %}
+  {% assign account_users       = account_users_query.results %}
+
+  {% for account_user in account_users %}
+    {% if account_user.email != nil and account_user.email contains "@" %}
+      {% if account_user.app_id == project.app_id %}
+
+        {% assign app_user_emails     = app_user_emails | push_to_array: account_user.email %}
+
+      {% else %}
+
+        {% assign unknown_user_emails = unknown_user_emails | push_to_array: account_user.email %}
+
+      {% endif %}
+    {% endif %}
+  {% endfor %}
+{% endif %}

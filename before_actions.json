@@ -1,0 +1,8 @@
+{
+  "authenticate": {
+    "ticket_events": false
+  },
+  "container": {
+    "ticket_events__create": "ticket_events"
+  }
+}

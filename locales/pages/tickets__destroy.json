@@ -1,0 +1,8 @@
+{
+  "en": {
+    "response_texts": {
+      "not_found": "The ticket was not found",
+      "destroyed_ticket": "The ticket has been destroyed"
+    }
+  }
+}

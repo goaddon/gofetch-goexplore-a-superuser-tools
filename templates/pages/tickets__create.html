@@ -1,0 +1,43 @@
+{% if account != nil and user.superuser %}
+
+  {% assign token       = nil | new_uuid | encrypt %}
+  {% assign log         = "" | split: " " %}
+  {% assign now         = "now" | in_time_zone %}
+  {% assign document    = nil | new_hash: status: "opened", author_id: user._id %}
+  {% assign document    = document | push_to_hash: "token", token %}
+  {% assign document    = document | push_to_hash: "log", log %}
+  {% assign document    = document | push_to_hash: "opened_at", now %}
+  {% assign encrypt     = "email phone admin_url admin_username admin_password comments ftp_host ftp_username ftp_password ssh_address ssh_password" | split: " " %}
+  {% assign field_names = "company_id webshop_id auth_id relay_id" | split: " " %}
+  {% assign field_names = field_names | concat: encrypt %}
+
+  {% for field_name in field_names %}
+    {% if params[field_name] != nil and params[field_name] != "" %}
+
+      {% if encrypt contains field_name %}
+
+        {% assign field_value = params[field_name] | encrypt %}
+
+      {% else %}
+
+        {% assign field_value = params[field_name] %}
+
+      {% endif %}
+
+      {% assign document = document | push_to_hash: field_name, field_value %}
+
+    {% endif %}
+  {% endfor %}
+
+  {% assign ticket_insertion  = "create_ticket" | db_insert_one: document: document %}
+
+  {% if ticket_insertion.created_count == 1 %}
+
+    {"url": "{{ 'tickets__show' | path_for: id: ticket_insertion._id }}", "success": "{{ l.ticket_created }}"}
+
+  {% else %}
+
+    {"url": "{{ 'tickets__new' | path_for }}", "error": "{{ l.created_not_ticket }}"}
+
+  {% endif %}
+{% endif %}

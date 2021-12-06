@@ -1,0 +1,12 @@
+{
+  "en": {
+    "title": "Create ticket",
+    "errors": {
+      "no_document": {
+        "webshop": "No webshop exists",
+        "auth": "No auth exists"
+      },
+      "no_klass": "You can only create tickets for a specific webshop or auth"
+    }
+  }
+}

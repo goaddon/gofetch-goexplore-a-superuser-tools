@@ -1,0 +1,6 @@
+{
+  "en": {
+    "no_job_id": "Internal error: no job_id",
+    "destroying_webshop": "Queued the webshop to be destroyed"
+  }
+}

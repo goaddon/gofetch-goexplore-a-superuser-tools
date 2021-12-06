@@ -1,0 +1,23 @@
+{% if left_tr_count >= right_tr_count %}
+
+  {% assign border_klass = "border-top-0" %}
+
+{% else %}
+
+  {% assign border_klass = "" %}
+
+{% endif %}
+<tr>
+  <td width="1" class="text-nowrap border-bottom-0 {{ border_klass }}">
+    <b>{{ l.headers.comments }}:</b>
+  </td>
+  <td class="border-bottom-0 {{ border_klass }} text-break">
+  </td>
+</tr>
+<tr>
+  <td colspan="2" class="border-top-0">
+    <div class="border-start border-3 ps-2">
+      {{ document.comments | decrypt | strip_html | newline_to_br }}
+    </div>
+  </td>
+</tr>

@@ -1,0 +1,34 @@
+<h5 class="mb-4">
+  {{ l.headlines.intro }} <a href="{{ 'webshops__index' | path_for }}">{{ l.headlines.return }} <i class="fas fa-undo"></i></a>
+</h5>
+
+<script>
+  var destroy_webshop_job_url = "{{ 'jobs__show' | path_for: id: params.id, format: 'json' }}";
+</script>
+
+<p class="pending-explainer">{{ l.explainers.pending }}</p>
+
+<div class="job-result" style="display: none;">
+
+  <p>{{ l.explainers.finished }}</p>
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th class="border-0"></th>
+        <th class="border-0 text-end" width="1">{{ l.headers.destroyed_count }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% assign klasses = "customers orders order_lines shipments variants products categories countries delivery_methods payment_methods stock_messages statuses webshops" | split: " " %}
+      {% for klass in klasses %}
+        <tr>
+          <td>{{ l.klasses[klass] }}</td>
+          <td class="text-end" width="1">
+            <span data-klass="{{ klass }}">-</span>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>

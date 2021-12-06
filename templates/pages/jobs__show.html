@@ -1,0 +1,29 @@
+{% if account != nil and user.superuser %}
+
+  {% assign job = params.id | get_job %}
+
+  {% if job.status == "erred" %}
+
+    {% if job.data != nil and job.data.error_message != nil %}
+
+      {"status": "200", "job_status": "{{ job.status }}", "data": {"error_message": "{{ job.data.error_message }}"}}
+
+    {% else %}
+
+      {"status": "200", "job_status": "{{ job.status }}"}
+
+    {% endif %}
+
+  {% else %}
+
+    {% if job.name != "destroy_webshop" and user.superuser_level != 1 %}
+
+      {"status": "200", "job_status": "{{ job.status }}", "name": "{{ job.name }}"}
+
+    {% else %}
+
+      {"status": "200", "job_status": "{{ job.status }}", "name": "{{ job.name }}", "data": {{ job.data | hash_to_json }}}
+
+    {% endif %}
+  {% endif %}
+{% endif %}

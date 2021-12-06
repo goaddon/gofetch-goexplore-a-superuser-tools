@@ -1,0 +1,4 @@
+{{ params.superuser_email }} {% if params.website != nil %}{{ l.subjects.company }} {{ params.website }} (#{{ params.ticket_id }}){% elsif params.auth_id != nil %}{{ l.subjects.auth }} #{{ params.auth_id }}{% else %}{{ l.subjects.ticket }} #{{ params.ticket_id }}{% endif %}
+<p>
+  {{ l.history.p1 }} <a href="{{ params.ticket_url }}">{{ l.history.p2 }}</a>.
+</p>

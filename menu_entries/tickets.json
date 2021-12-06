@@ -1,0 +1,14 @@
+{
+  "title": {
+    "en": "Tickets"
+  },
+  "paths": [
+    {
+      "controller": "tickets",
+      "action": "index"
+    },
+    {
+      "controller": "tickets"
+    }
+  ]
+}

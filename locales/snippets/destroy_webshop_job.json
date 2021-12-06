@@ -1,0 +1,30 @@
+{
+  "en": {
+    "headlines": {
+      "intro": "View status of this job, or",
+      "return": "return"
+    },
+    "explainers": {
+      "pending": "Please wait...",
+      "finished": "The job has finished. Please review the results below."
+    },
+    "headers": {
+      "destroyed_count": "Destroyed"
+    },
+    "klasses": {
+      "customers": "Customers",
+      "orders": "Orders",
+      "order_lines": "Order lines",
+      "shipments": "Shipments",
+      "variants": "Variants",
+      "products": "Products",
+      "categories": "Categories",
+      "countries": "Countries",
+      "delivery_methods": "Delivery methods",
+      "payment_methods": "Payment methods",
+      "stock_messages": "Stock messages",
+      "statuses": "Statuses",
+      "webshops": "Webshops"
+    }
+  }
+}

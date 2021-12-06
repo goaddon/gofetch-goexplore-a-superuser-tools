@@ -1,0 +1,53 @@
+{
+  "auths": {
+    "klass": "auths",
+    "query": {
+      "_id": "{{ _id }}"
+    },
+    "projection": {
+      "_id": 1,
+      "relay_id": 1,
+      "remote_ip": 1,
+      "status": 1,
+      "status_description": 1,
+      "setup_config": 1,
+      "webshop_config": 1,
+      "error": 1,
+      "log": 1,
+      "webshop_id": 1
+    }
+  },
+  "tickets": {
+    "klass": "tickets",
+    "query": {
+      "auth_id": "{{ auth_id }}"
+    },
+    "projection": {
+      "_id": 1,
+      "status": 1,
+      "opened_at": 1,
+      "closed_at": 1,
+      "superuser_id": 1
+    }
+  },
+  "webshops": {
+    "klass": "webshops",
+    "query": {
+      "_id": "{{ _id }}"
+    },
+    "projection": {
+      "_id": 1,
+      "company_id": 1
+    }
+  },
+  "companies": {
+    "klass": "companies",
+    "query": {
+      "_id": "{{ _id }}"
+    },
+    "projection": {
+      "_id": 1,
+      "website": 1
+    }
+  }
+}

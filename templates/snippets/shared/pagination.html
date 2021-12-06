@@ -1,0 +1,107 @@
+{% assign btn_border_color  = "border-color:#a0a4a9;" %}
+{% capture btn_style %}min-width: 50px;{{ btn_border_color }}{% endcapture %}
+
+<div class="row justify-content-between">
+  {% if documents_query.pages_count > 1 %}
+    {% assign first_page        = 0 %}
+    {% assign last_page         = documents_query.pages_count | minus: 1 | at_least: 0 %}
+    <div class="col-12 col-md-auto">
+      <div class="btn-group mb-1" role="group" aria-label="pagination">
+        {% if documents_query.page == first_page %}
+          <button type="button" class="btn btn-outline-secondary disabled" style="{{ btn_style }}">{{ l.pager.previous }}</button>
+        {% else %}
+          {% assign prev_page = documents_query.page | minus: 1 %}
+          <a href="{{ session.page | path_for: page: prev_page, per_page: documents_query.per_page, scope: scope}}" class="btn btn-outline-primary" style="{{ btn_style }}">{{ l.pager.previous }}</a>
+        {% endif %}
+
+        {% assign page_minus_6      = documents_query.page | minus: 6 %}
+        {% assign page_plus_6       = documents_query.page | plus: 6 %}
+
+        {% assign before_pages      = 6 %}
+        {% assign after_pages       = 6 %}
+
+        {% for page_n in (page_minus_6..page_plus_6) %}
+          {% if first_page > page_n %}
+            {% assign after_pages   = after_pages | plus: 1 %}
+          {% elsif page_n > last_page %}
+            {% assign before_pages  = before_pages | plus: 1 %}
+          {% endif %}
+        {% endfor %}
+
+        {% assign start_page        = documents_query.page | minus: before_pages %}
+        {% assign end_page          = documents_query.page | plus: after_pages %}
+
+        {% if first_page > start_page %}
+          {% assign start_page      = first_page %}
+        {% endif %}
+
+        {% if end_page > last_page %}
+          {% assign end_page        = last_page %}
+        {% endif %}
+
+        {% assign start_page_plus_2 = start_page | plus: 2 %}
+        {% assign end_page_minus_2  = end_page | minus: 2 %}
+
+        {% assign first_page_plus_2 = first_page | plus: 2 %}
+        {% assign last_page_minus_2 = last_page | minus: 2 %}
+
+        {% for page_i in (start_page..end_page) %}
+          {% if page_i == documents_query.page %}
+            <button type="button" class="btn btn-outline-primary active" style="{{ btn_style }}">{{ page_i | plus: 1 }}</button>
+          {% else %}
+            {% if start_page_plus_2 >= page_i %}
+              {% assign factor      = page_i | minus: start_page %}
+              {% assign page_number = first_page | plus: factor %}
+            {% elsif page_i >= end_page_minus_2 %}
+              {% assign factor      = end_page | minus: page_i %}
+              {% assign page_number = last_page | minus: factor %}
+            {% else %}
+              {% assign factor      = "none" %}
+              {% assign page_number = page_i %}
+            {% endif %}
+
+            {% if page_number == first_page_plus_2 or page_number == last_page_minus_2 %}
+              {% assign dots = true %}
+            {% else %}
+              {% assign dots = false %}
+            {% endif %}
+
+            {% if page_i != page_number and dots %}
+              <button type="button" class="btn btn-outline-secondary disabled" style="{{ btn_style }}">...</button>
+            {% else %}
+              <a href="{{ session.page | path_for: page: page_number, per_page: documents_query.per_page, scope: scope}}" class="btn btn-outline-primary" style="{{ btn_style }}">{{ page_number | plus: 1 }}</a>
+            {% endif %}
+
+          {% endif %}
+        {% endfor %}
+
+        {% if documents_query.page == last_page %}
+          <button type="button" class="btn btn-outline-secondary disabled" style="{{ btn_style }}">{{ l.pager.next }}</button>
+        {% else %}
+          {% assign next_page = documents_query.page | plus: 1 %}
+          <a href="{{ session.page | path_for: page: next_page, per_page: documents_query.per_page, scope: scope}}" class="btn btn-outline-primary" style="{{ btn_style }}">{{ l.pager.next }}</a>
+        {% endif %}
+      </div>
+    </div>
+  {% endif %}
+  <div class="col-12 col-md-auto">
+    <div class="btn-group dropup float-md-end">
+      <button type="button" class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" style="{{ btn_border_color }}">
+        {{ documents_query.per_page }} {{ l.per_page.outro }} {{ l.per_page.selected_outro }}
+      </button>
+      <ul class="dropdown-menu" aria-labelledby="per_page_dropdown">
+        {% assign pagination_options = "10 20 30 50 100 200 300 400 500 1000" | split: " " %}
+        {% for pagination_option in pagination_options %}
+          <li>
+            {% assign pagination_option_number = pagination_option | plus: 0 %}
+            {% if pagination_option_number == documents_query.per_page %}
+              <a class="dropdown-item disabled" href="#">{{ pagination_option }} {{ l.per_page.outro }}</a>
+            {% else %}
+              <a class="dropdown-item" href="{{ session.page | path_for: page: 0, per_page: pagination_option, scope: scope }}">{{ pagination_option }} {{ l.per_page.outro }}</a>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>

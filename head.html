@@ -1,0 +1,734 @@
+<script>
+  var submitting_request = false;
+
+  submitShopApiRequest = function() {
+    $(".shop-api-form").off("submit");
+    $(".shop-api-form").on("submit", function(e) {
+      e.preventDefault();
+
+      if (submitting_request) {
+        flashAlert("error", "{{ l.webshops.show.flash.submitting_request }}");
+        return;
+      } else {
+        submitting_request = true;
+      }
+
+      var form_action             = $(this).attr("action");
+      var form_method             = $(this).attr("method");
+      var resource_name           = $(this).find(":input[name=resource_name]").val();
+      var endpoint_name           = $(this).find(":input[name=endpoint_name]").val();
+      var document_id             = $(this).find(":input[name=document_id]").val();
+      var webshop_id              = $(this).find(":input[name=webshop_id]").val();
+      var unfiltered_response     = $(this).find(":input[name=unfiltered_response]").is(':checked');
+      var bypass_db               = $(this).find(":input[name=bypass_db]").is(':checked');
+      var http_method             = $(this).find(":input[name=http_method]").val();
+      var response_container      = $(this).find(".response-container");
+      var response_pre            = response_container.find("pre");
+      var response_code           = response_pre.find("code");
+      var form_submit             = $(this).find(":input[type=submit]");
+      var form_submitting         = $(this).find("[data-type=submitting]");
+      var url_params              = [];
+      var request_data            = {"webshop_id": webshop_id, "http_method": http_method, "resource_name": resource_name, "endpoint_name": endpoint_name, "unfiltered_response": unfiltered_response, "bypass_db": bypass_db};
+
+      $(this).find(":input[type=text], :input[type=hidden]").each(function() {
+        if ($(this).val() != "") {
+          if ($(this).attr("name") === "document_id") {
+            request_data["document_id"] = $(this).val();
+          } else if ($(this).data("type") === "param") {
+            var url_param = $(this).attr("name") + "=" + $(this).val();
+            url_params.push(url_param);
+          }
+        }
+      });
+
+      if (url_params.length > 0) {
+        request_data["url_params"] = url_params;
+      }
+
+      var body_input = $(this).find(":input[name=body]");
+
+      if (body_input.length > 0) {
+        request_data["body"] = JSON.parse(body_input.val());
+      }
+
+      form_submit.hide();
+      form_submitting.show();
+      response_pre.slideUp(120);
+
+      $.ajax({
+        url: form_action,
+        type: form_method,
+        dataType: "json",
+        contentType: "application/json",
+        data: JSON.stringify(request_data),
+        success: function(event) {
+          var response_json     = JSON.stringify(event.response_json, undefined, 2);
+          var highlighted_json  = Prism.highlight(response_json, Prism.languages.json, 'json');
+
+          response_code.empty().html(highlighted_json);
+          response_pre.slideDown(120);
+          form_submit.show();
+          form_submitting.hide();
+          submitting_request = false;
+        },
+        error: function (event) {
+          if (event.responseText !== undefined) {
+            try {
+              var parsed_json       = JSON.parse(event.responseText);
+              var response_json     = JSON.stringify(parsed_json, undefined, 2);
+              var highlighted_json  = Prism.highlight(response_json, Prism.languages.json, 'json');
+              response_code.empty().html(highlighted_json);
+            }
+            catch(err) {
+              var highlighted_json  = event.responseText;
+              response_code.empty().text(highlighted_json);
+            }
+
+          } else {
+            var highlighted_json  = event;
+            response_code.empty().text(highlighted_json);
+          }
+          response_pre.slideDown("slow");
+          form_submit.show();
+          form_submitting.hide();
+          submitting_request = false;
+        }
+      });
+      return;
+    });
+  };
+
+  Date.prototype.toIso8601String = function() {
+    var tzo = -this.getTimezoneOffset(),
+      dif = tzo >= 0 ? '+' : '-',
+      pad = function(num) {
+        var norm = Math.floor(Math.abs(num));
+        return (norm < 10 ? '0' : '') + norm;
+      };
+
+    return this.getFullYear() +
+      '-' + pad(this.getMonth() + 1) +
+      '-' + pad(this.getDate()) +
+      'T' + pad(this.getHours()) +
+      ':' + pad(this.getMinutes()) +
+      ':' + pad(this.getSeconds()) +
+      dif + pad(tzo / 60) +
+      ':' + pad(tzo % 60);
+  };
+
+  insertDateParam = function() {
+    $("[data-action=date]").off("click");
+    $("[data-action=date]").click(function() {
+      var hours = $(this).data("hours");
+      var date  = new Date(new Date().getTime() - (hours * 60 * 60 * 1000));
+      $(this).closest(".input-group").find("input").val(date.toIso8601String());
+    });
+  };
+
+  followResources = function() {
+    var random = Math.random().toString(36).substring(7);
+    return $('a.resource-tab[data-bs-toggle="tab"]').on('shown.bs.tab', function(e) {
+      followEndpoint("");
+      var old_resource = $(e.relatedTarget).attr("data-resource");
+      var old_param = "resource=" + old_resource;
+      var new_resource = $(e.target).attr("data-resource");
+      var new_param = "resource=" + new_resource;
+      var old_href = location.href.split('#')[0];
+      if (old_href.includes(old_param)) {
+        var new_href = old_href.replace(old_param, new_param);
+      } else {
+        if (old_href.includes("?")) {
+          var connector = "&";
+        } else {
+          var connector = "?";
+        }
+        var new_href = "" + old_href + connector + new_param;
+      }
+      return window.history.replaceState(null, null, new_href);
+    });
+  };
+
+  followShownEndpoints = function() {
+    return $('.endpoint-collapse').on('shown.bs.collapse', function(e) {
+      var new_param = $(e.target).attr("data-endpoint");
+      if (new_param !== undefined) {
+        followEndpoint(new_param);
+      }
+      return;
+    });
+  };
+
+  followHiddenEndpoints = function() {
+    return $('.endpoint-collapse').on('hide.bs.collapse', function(e) {
+      var current_param = $(e.target).attr("data-endpoint");
+      if (current_param !== undefined) {
+        followEndpoint("");
+      }
+      return;
+    });
+  };
+
+  followEndpoint = function(new_param) {
+    var old_href = location.href.split('#')[0];
+
+    if (old_href.includes("endpoint=")) {
+      var new_href = old_href.replace(/(endpoint=).*?(&|$)/,'$1' + new_param + '$2');
+    } else {
+      if (old_href.includes("?")) {
+        var connector = "&";
+      } else {
+        var connector = "?";
+      }
+      var new_href = "" + old_href + connector + "endpoint=" + new_param;
+    }
+    return window.history.replaceState(null, null, new_href);
+  };
+
+  jobUrl = function() {
+    return "{{ 'jobs__show' | path_for: id: 'id_placeholder', format: 'json' }}";
+  };
+
+  checkEmailJob = function(log_entry_id, job_id, attempts_left = 3) {
+    return setTimeout((function() {
+      var log_entry = $("[data-log-entry-id=" + log_entry_id + "]");
+      return $.ajax({
+        type: "get",
+        dataType: "json",
+        url: jobUrl().replace("id_placeholder", job_id),
+        success: function(data, status, xhr) {
+          if (data !== undefined) {
+            if (data.job_status === "pending" || data.job_status === "in_progress") {
+              if (attempts_left <= 0) {
+                return flashAlert("error", "{{ l.tickets.show.mail_job.unresolved }}");
+              } else {
+                return checkEmailJob(log_entry_id, job_id, attempts_left - 1);
+              }
+            } else if (data.job_status === "erred") {
+              log_entry.find($("[data-job-container=" + job_id + "]")).addClass("text-danger border-danger");
+              if (data.data !== undefined) {
+                log_entry.find($("[data-job-error=" + job_id + "]")).attr("title", data.data.error_message).show();
+              }
+              return flashAlert("error", "{{ l.tickets.show.mail_job.erred }}");
+            } else if (data.job_status === "finished") {
+              return log_entry.find($("[data-job-container=" + job_id + "]")).removeClass("text-secondary");
+            }
+          }
+        },
+        error: function(data, status, code) {
+          log_entry.find($("[data-job-container=" + job_id + "]")).addClass("text-danger border-danger");
+          if (data !== undefined && data.responseJSON !== undefined) {
+            log_entry.find($("[data-job-error=" + job_id + "]")).attr("title", data.responseJSON.error_message).show();
+            return flashAlert("error", "{{ l.tickets.show.mail_job.unexpected_error }}");
+          } else {
+            return flashAlert("error", code);
+          }
+        }
+      });
+    }), 2000);
+  };
+
+  markdownSupportFees = function() {
+    if ($("#markdown_confirm").length > 0) {
+      var converter = new showdown.Converter({});
+      var markdown  = decodeURIComponent($("#markdown_confirm").data("markdown").toString().replaceAll("+", " "));
+      $("#markdown_confirm").attr("data-confirm", converter.makeHtml(markdown));
+    }
+  };
+
+  function textAreaAdjust(element) {
+    element.style.height = "1px";
+    element.style.height = (26 + element.scrollHeight) + "px";
+  }
+
+  function copyFormInput(form_field_name) {
+    var input                   = document.querySelector("[data-copy='" + form_field_name + "']");
+    var button                  = document.querySelector("[data-copy-button='" + form_field_name + "']");
+    var placeholder             = document.querySelector("[data-copy-placeholder='" + form_field_name + "']");
+    input.style.display         = "inline";
+    button.style.display        = "none";
+    placeholder.style.display   = "inline";
+    input.select();
+    input.setSelectionRange(0, 99999);
+    document.execCommand("copy");
+    input.style.display         = "none";
+    flashAlert("success", "{{ l.tickets.show.flash.copied }} " + input.value);
+    setTimeout(function(){
+      button.style.display      = "inline";
+      placeholder.style.display = "none";
+    }, 1000);
+  }
+
+  formatRecipientState = function(state) {
+    if (state.element === undefined || state.element.attributes["data-recipient"] === undefined) {
+      return state.text;
+    } else {
+
+      var recipient = state.element.attributes["data-recipient"].value;
+
+      if (recipient === document_email) {
+        var text = recipient.concat(" &#183; <b>{{ l.tickets.show.recipients.author }}</b>");
+        return jQuery.parseHTML(text);
+      } else if (recipient === "relay") {
+        var text = relayAuthorName();
+        return jQuery.parseHTML(text);
+      } else if (app_user_emails.indexOf(recipient) !== -1) {
+        var text = recipient.concat(" &#183; <b>{{ l.tickets.show.recipients.app_user }}</b>");
+        return jQuery.parseHTML(text);
+      } else if (unknown_user_emails.indexOf(recipient) !== -1) {
+        var text = recipient.concat(" &#183; <b>{{ l.tickets.show.recipients.unknown_user }}</b>");
+        return jQuery.parseHTML(text);
+      } else if (superuser_emails.indexOf(recipient) !== -1) {
+        var text = recipient.concat(" &#183; <b>{{ l.tickets.show.recipients.superuser }}</b>");
+        return jQuery.parseHTML(text);
+      } else {
+        return recipient;
+      }
+
+    }
+  };
+
+  selectRecipients = function() {
+    $(".input-select2-recipients").select2({
+      placeholder: "{{ l.tickets.show.recipients.placeholder }}",
+      multiple: true,
+      allowClear: false,
+      tags: true,
+      sorter: function(data) {
+        return data.sort(function(a, b) {
+          a = a.text.toLowerCase();
+          b = b.text.toLowerCase();
+          if (a > b) {
+            return 1;
+          } else if (a < b) {
+            return -1;
+          }
+          return 0;
+        });
+      },
+      templateResult: formatRecipientState,
+      templateSelection: formatRecipientState
+    });
+
+    $(".input-select2-recipients").on("select2:select", function(e) {
+      var id      = e.params.data.id;
+      var option  = $(e.target).children("[value='" + id + "']");
+      option.detach();
+      $(e.target).append(option).change();
+    });
+  };
+
+  relayAuthorName = function() {
+    return relay_author + " &#183; <b>" + relay_name + " {{ l.tickets.show.recipients.relay }}</b>"
+  };
+
+  fillRelayAuthorName = function() {
+    $("[data-participant=relay]").html(relayAuthorName);
+  };
+
+  applyMessage = function() {
+    $("#message_form").on("ajax:before", function(event) {
+      var message_input           = $(this).find(":input[name='message']");
+      var converter               = new showdown.Converter({});
+      var rendered_message_input  = $("<input>").attr({
+        type: "hidden",
+        name: "rendered_message",
+        value: converter.makeHtml(message_input.val())
+      });
+      rendered_message_input.appendTo($(this));
+      return;
+    }).on("ajax:success", function(event) {
+      $(this).find(":input[name='message']").val("");
+      $(".input-select2-recipients").val(null).trigger("change");
+      $(this).find(":input[name='rendered_message']").remove();
+      $("#log_accordion .collapse").addClass("show");
+      applyMarkdownAndSyntax();
+      fillRelayAuthorName();
+    }).on("ajax:error", function(event) {
+      $(this).find(":input[name='rendered_message']").remove();
+    })
+  };
+
+  selectRelays = function() {
+    $(".input-select2-permissions").select2({
+      placeholder: "{{ l.superusers.permissions.placeholders.select }}",
+      multiple: true,
+      allowClear: true,
+      sorter: function(data) {
+        return data.sort(function(a, b) {
+          a = a.text.toLowerCase();
+          b = b.text.toLowerCase();
+          if (a > b) {
+            return 1;
+          } else if (a < b) {
+            return -1;
+          }
+          return 0;
+        });
+      }
+    });
+
+    $(".input-select2-permissions").on("select2:select", function(e) {
+      var id      = e.params.data.id;
+      var option  = $(e.target).children("[value='" + id + "']");
+      option.detach();
+      $(e.target).append(option).change();
+    });
+  };
+
+  submitUpdateWebshopRequest = function() {
+    $("form.update-webshop-form").off("submit");
+    $("form.update-webshop-form").on("submit", function(e) {
+
+      e.preventDefault();
+
+      var form_action             = $(this).attr("action");
+      var form_method             = $(this).attr("method");
+      var form_submit             = $(this).find(":input[type=submit]");
+      var form_submitting         = $(this).find("[data-type=submitting]");
+      var request_data            = {};
+
+      var config_input            = $(this).find(":input[name=config]");
+      if (config_input.length > 0) {
+        request_data["config"]      = JSON.parse(config_input.val());
+      }
+
+      var got_at_attr_input       = $(this).find(":input[name=got_at_attr]");
+      if (got_at_attr_input.length > 0) {
+        request_data["got_at_attr"] = got_at_attr_input.val();
+        var got_at_option           = $(this).find("option[value=" + request_data["got_at_attr"] + "]");
+      }
+
+      var active_input            = $(this).find(":input[name=active]");
+      if (active_input.length > 0) {
+        request_data["active"]      = active_input.val();
+      }
+
+      form_submit.hide();
+      form_submitting.show();
+
+      $.ajax({
+        url: form_action,
+        type: form_method,
+        dataType: "json",
+        contentType: "application/json",
+        data: JSON.stringify(request_data),
+        success: function(data, status, xhr) {
+          if (data.success !== undefined) {
+            if (got_at_option !== undefined) {
+              got_at_option.attr("data-time", "").trigger('change');
+            }
+            if (request_data["active"] !== undefined) {
+              $(".toggle-active").each(function() {
+                if ("" + $(this).data("active") + "" === request_data["active"]) {
+                  $(this).show();
+                } else {
+                  $(this).hide();
+                }
+                var danger_zone = $("#danger_zone");
+                if (request_data["active"] === "true") {
+                  danger_zone.hide();
+                } else {
+                  danger_zone.show();
+                }
+              });
+            }
+            flashAlert("success", data.success);
+          } else if (data.message !== undefined) {
+            flashAlert("message", data.message);
+          }
+
+          form_submit.show();
+          form_submitting.hide();
+        },
+        error: function (data, status, error) {
+          if (data.responseJSON !== undefined) {
+            flashAlert("error", data.responseJSON.error);
+          } else {
+            flashAlert("error", "{{ l.webshops.edit.messages.internal_error }}");
+          }
+          form_submit.show();
+          form_submitting.hide();
+        }
+      });
+
+      return;
+    });
+  };
+
+  formatGotAtState = function(state) {
+    if (state.element === undefined) {
+      return state.text;
+    } else {
+      var title = state.element.attributes["data-title"].value;
+      if (state.element.attributes["data-time"].value != "") {
+        var title = title.concat(' &#183; <small><i>' + state.element.attributes["data-time"].value + '</i></small>');
+      }
+      return jQuery.parseHTML(title);
+    }
+  };
+
+  select2GotAt = function() {
+    $(".input-select2-got_at_attr").select2({
+      width: "100%",
+      placeholder: "{{ l.webshops.edit.placeholders.got_at_attr }}",
+      multiple: false,
+      allowClear: false,
+      tags: false,
+      sorter: function(data) {
+        return data.sort(function(a, b) {
+          a = a.text.toLowerCase();
+          b = b.text.toLowerCase();
+          if (a > b) {
+            return 1;
+          } else if (a < b) {
+            return -1;
+          }
+          return 0;
+        });
+      },
+      templateResult: formatGotAtState,
+      templateSelection: formatGotAtState
+    });
+
+    $(document).on('select2:open', () => {
+      setTimeout(function() {
+        document.querySelector('.select2-search__field').focus();
+      }, 10);
+    });
+  };
+
+  checkJob = function(job_url) {
+    if (destroy_webshop_job_url === job_url) {
+      return setTimeout((function() {
+        return $.ajax({
+          type: "get",
+          dataType: "json",
+          url: job_url,
+          success: function(data, status, xhr) {
+            if (data !== undefined) {
+              if (data.job_status === "pending" || data.job_status === "in_progress") {
+                return checkJob(job_url);
+              } else if (data.job_status === "erred") {
+                return flashAlert("error", "{{ l.destroy_webshop_jobs.show.statuses.erred }}");
+              } else if (data.job_status === "finished") {
+                if (data.data.error !== undefined) {
+                  return flashAlert("error", data.data.error);
+                } else {
+                  for (var key in data.data) {
+                    $("[data-klass=" + key + "]").html(data.data[key]);
+                  }
+                  $(".pending-explainer").remove();
+                  return $(".job-result").show();
+                }
+              }
+            }
+          },
+          error: function(data, status, code) {
+            if (data !== undefined && data.responseJSON !== undefined) {
+              return flashAlert("error", data.responseJSON.error);
+            } else {
+              return flashAlert("error", code);
+            }
+          }
+        });
+      }), 2000);
+    }
+  };
+
+  insertTemplate = function() {
+    $("[data-action=template]").off("click");
+    $("[data-action=template]").click(function() {
+      var value         = $(this).data("value");
+      var json_value    = decodeURIComponent(value.replaceAll("+", " "));
+      var string_value  = JSON.stringify(JSON.parse(json_value), undefined, 2);
+      var edit_area     = $(this).closest("form").find(".ace_editor");
+      var editor        = ace.edit(edit_area[0]);
+      editor.setValue(string_value, -1);
+    });
+  };
+
+  indentJsonInput = function() {
+    $(".json-container").each(function() {
+      if ($(this).find(".ace_editor").length == 0) {
+        var text_area           = $(this).find("textarea");
+        var edit_area           = $("<div>", {
+          "class": text_area.attr("class")
+        }).insertBefore(text_area);
+        text_area.css("display", "none");
+        var editor              = ace.edit(edit_area[0]);
+        editor.setFontSize("14px");
+        editor.$blockScrolling  = Infinity;
+        editor.setShowPrintMargin(false);
+        editor.setOptions({
+          minLines: 2,
+          maxLines: 30,
+          tabSize: 2
+        });
+        editor.setTheme("ace/theme/tomorrow");
+        editor.getSession().setMode("ace/mode/json");
+        editor.getSession().setValue(JSON.stringify(JSON.parse(text_area.val()), undefined, '\t'));
+        return editor.getSession().on("change", function () {
+          return text_area.val(editor.getSession().getValue());
+        });
+      }
+    });
+  };
+
+  applyMarkdownAndSyntax = function() {
+    if ($(".markdown").length > 0) {
+      var converter = new showdown.Converter({});
+      $(".markdown").each(function() {
+        if ($(this).data("markdown") !== undefined) {
+          var markdown = decodeURIComponent($(this).data("markdown").toString().replaceAll("+", " "));
+          var made_markdown = converter.makeHtml(markdown);
+          $(this).html(made_markdown);
+        }
+      });
+    }
+
+    $(".json-pre-container").each(function() {
+      var pre_code      = $(this).find("pre code");
+      var json_source   = $(this).find(".json-source").text();
+      var source_json   = JSON.stringify(JSON.parse(json_source), undefined, 2);
+      if (json_source.length < 100000) {
+        pre_code.addClass("language-json").text(source_json);
+      } else {
+        pre_code.addClass("language-none").text(source_json);
+      }
+    });
+
+    return Prism.highlightAll();
+  };
+
+  function textAreaAdjust(element) {
+    element.style.height = "1px";
+    element.style.height = (26 + element.scrollHeight) + "px";
+  }
+
+  $(document).on('turbo:load', function() {
+    if ($("body").hasClass("webshops-show")) {
+      submitShopApiRequest();
+      insertDateParam();
+      insertTemplate();
+      followResources();
+      followShownEndpoints();
+      followHiddenEndpoints();
+    }
+
+    if ($("body").hasClass("tickets-show")) {
+      markdownSupportFees();
+      selectRecipients();
+      fillRelayAuthorName();
+      applyMessage();
+    }
+
+    if ($("body").hasClass("superusers-permissions")) {
+      selectRelays();
+    }
+
+    if ($("body").hasClass("webshops-edit")) {
+      submitUpdateWebshopRequest();
+      select2GotAt();
+    }
+
+    if ($("body").hasClass("destroy_webshop_jobs-show")) {
+      checkJob(destroy_webshop_job_url);
+    }
+
+    if ($("body").hasClass("webshops-edit") || $("body").hasClass("webshops-show")) {
+      indentJsonInput();
+    }
+
+    if ($("body").hasClass("auths-show") || $("body").hasClass("webshops-show") || $("body").hasClass("webshops-edit") || $("body").hasClass("tickets-show")) {
+      applyMarkdownAndSyntax();
+    }
+  })
+</script>
+
+<style>
+  /*label p {
+    margin: 0;
+    padding: 0;
+  }*/
+
+  .response-container pre {
+    max-height: 90vh;
+    overflow: auto;
+  }
+
+  .http-method {
+    min-width: 80px;
+  }
+
+  .http-method-get {
+    border: 1px solid #016cde;
+    color: #016cde;
+  }
+
+  .http-method-post {
+    border: 1px solid #28a745;
+    color: #28a745;
+  }
+
+  .http-method-patch {
+    border: 1px solid #8300a9;
+    color: #8300a9;
+  }
+
+  .http-method-delete {
+    border: 1px solid #dc3545;
+    color: #dc3545;
+  }
+
+  .comments-markdown pre {
+    margin-bottom: 20px;
+  }
+</style>
+
+<style>
+  .select2-selection--single, .select2-search__field {
+    outline: none;
+  }
+
+  .select2-container--default.select2-container .select2-selection--multiple {
+    border: solid #ced4da 1px;
+  }
+
+  .select2-container--default.select2-container--focus .select2-selection--multiple {
+    border: solid #007bff 1px;
+  }
+
+  .select2-container .select2-search--inline .select2-search__field {
+    padding-left: 8px;
+  }
+</style>
+
+<style>
+  .input-select2 {
+    width: 100%;
+  }
+
+  .select2-selection__choice {
+    background-color: #e9ecef !important;
+  }
+
+  .select2-container .select2-selection--single {
+    height: 38px !important;
+  }
+
+  .select2-selection__arrow {
+    height: 37px !important;
+  }
+
+  .select2-selection__placeholder {
+    color: #6c757d !important;
+  }
+
+  .select2-container--default .select2-selection--single {
+    border: 1px solid #ced4da;
+  }
+
+  span.select2-selection__rendered {
+    line-height: 34px !important;
+  }
+</style>

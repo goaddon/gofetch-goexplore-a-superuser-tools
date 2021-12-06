@@ -1,0 +1,107 @@
+{% if documents.size == 0 %}
+  <h5 class="mb-4">{{ l.headlines.no_auths }}</h5>
+  {% if error != nil %}
+    <p class="text-danger">{{ error }}.</p>
+  {% endif %}
+{% else %}
+
+  {% include "shared/extra_table_cols" %}
+
+  <h5 class="mb-4">{{ l.headlines.auths }}</h5>
+
+  {% if error != nil %}
+
+    <p class="text-danger">{{ error }}.</p>
+
+  {% else %}
+
+    <table class="table">
+      <thead>
+        <tr>
+          <th class="border-0">{{ l.headers.config }}</th>
+          <th class="border-0">{{ l.headers.relay_name }}</th>
+          <th class="border-0">{{ l.headers.created_at }}</th>
+          <th class="border-0">{{ l.headers.status }}</th>
+          <th class="border-0"></th>
+          {% include "shared/extra_table_ths" %}
+          <th class="border-0"></th>
+        </tr>
+      </thead>
+      <tbody>
+
+        {% assign now = "now" | in_time_zone %}
+
+        {% for document in documents %}
+          {% assign created_at  = document._id | generation_time %}
+          {% assign relay_id    = document.relay_id %}
+          {% assign company_id  = nil %}
+          <tr>
+            <td>
+              {% if relays[relay_id] != nil %}
+                <samp>
+                  {% assign identifiable_config_keys = 0 %}
+                  {% for identifiable_config_key in relays[relay_id].identifiable_config_keys %}
+                    {% if identifiable_config_key != relays[relay_id].identifiable_config_keys.first %}
+                      &#183;
+                    {% endif %}
+                    {% if document.webshop_config[identifiable_config_key] != nil and document.webshop_config[identifiable_config_key] != "" %}
+                      {% assign identifiable_config_keys = identifiable_config_keys | plus: 1 %}
+                      {{ document.webshop_config[identifiable_config_key] | decrypt }}
+                    {% endif %}
+                  {% endfor %}
+
+                  <span class="text-secondary">
+                    {% if identifiable_config_keys == 0 %}
+                      {{ l.informations.no_identifiable_config_keys }}
+                    {% endif %}
+                  </span>
+                </samp>
+              {% endif %}
+
+            </td>
+            <td>
+              {% if relays[relay_id] == nil %}
+                <span class="badge badge-danger">{{ l.badges.no_relay }}</span>
+              {% else %}
+                {{ relays[relay_id].name }}
+              {% endif %}
+            </td>
+            <td>
+              <span title="{{ created_at | i18n_l: 'wday_date_hours_minutes' | capitalize }}">
+                {{ created_at | time_distance_in_words: now | capitalize }} {{ l.informations.ago }}
+              </span>
+            </td>
+            <td>
+              {% include "shared/auths/status" %}
+            </td>
+            {% include "shared/auths/show_auth" %}
+
+            {% if show_auth %}
+
+              {% assign link_path     = "auths__show" %}
+              {% assign link_name     = l.buttons.show %}
+              {% assign link_icon     = "fas fa-wrench" %}
+
+            {% else %}
+
+              {% assign link_path     = nil %}
+              {% assign link_name     = nil %}
+              {% assign link_icon     = nil %}
+
+            {% endif %}
+            {% include "shared/table_link" %}
+            {% include "shared/extra_table_links" %}
+            <td class="text-end text-nowrap" width="1">
+              <form method="post" action="{{ 'auths__destroy' | path_for: id: document._id }}">
+                <input type="hidden" name="_method" value="delete">
+                <button type="submit" class="bg-body border-0 link-danger p-0"><i class="fas fa-trash text-danger"></i></button>
+              </form>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    {% include "shared/pagination" %}
+  {% endif %}
+{% endif %}

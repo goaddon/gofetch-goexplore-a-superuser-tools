@@ -1,0 +1,37 @@
+{% if tickets.size > 0 %}
+  <table class="table">
+    <thead>
+      <tr>
+        <th class="border-bottom-0">{{ l.headers.opened_at }}</th>
+        <th class="border-bottom-0">{{ l.headers.closed_at }}</th>
+        <th class="border-bottom-0 text-end">{{ l.headers.status }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% assign sorted_tickets = tickets | sort: "opened_at" | reverse %}
+
+      {% for ticket in sorted_tickets %}
+        <tr>
+          <td>
+            <a href="{{ 'tickets__show' | path_for: id: ticket._id }}"><span title="{{ ticket.opened_at | i18n_l: 'wday_date_hours_minutes' | capitalize }}">{{ ticket.opened_at | time_distance_in_words: now | capitalize }} {{ l.body.ago }}</span></a>
+            &#183;
+            <a href="{{ 'tickets__show' | path_for: id: ticket._id }}" target="_blank"><i class="fas fa-external-link-alt"></i></a>
+          </td>
+          <td>
+            {% if ticket.closed_at != nil %}
+              <span title="{{ ticket.closed_at | i18n_l: 'wday_date_hours_minutes' | capitalize }}">
+                {{ ticket.closed_at | time_distance_in_words: now | capitalize }} {{ l.body.ago }}
+              </span>
+            {% else %}
+              -
+            {% endif %}
+          </td>
+          <td class="text-end text-nowrap" width="1">
+            {% assign ticket_status = ticket.status %}
+            {% include "shared/ticket_status" %}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endif %}

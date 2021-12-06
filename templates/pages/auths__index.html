@@ -1,0 +1,27 @@
+{% if account != nil and user.superuser %}
+
+  {% if user.superuser_level == 1 %}
+
+    {% assign documents_query = "superuser_level_1_auths" | db_find: page: params.page, per_page: params.per_page %}
+
+  {% elsif user.auth_relay_ids != nil and user.auth_relay_ids.size > 0 %}
+
+    {% assign documents_query = "superuser_auths" | db_find: page: params.page, per_page: params.per_page, relay_ids: user.auth_relay_ids %}
+
+  {% endif %}
+
+  {% if documents_query == nil %}
+
+    {% assign error = l.errors.no_access %}
+
+  {% else %}
+
+    {% assign documents = documents_query.results %}
+
+    {% include "shared/get_gofetch_relays" %}
+
+  {% endif %}
+
+  {% include "auths" %}
+
+{% endif %}

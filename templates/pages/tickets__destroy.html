@@ -1,0 +1,26 @@
+{% if account != nil and user.superuser %}
+
+  {% assign documents_query = "tickets" | db_find: _id: params.id %}
+  {% assign document        = documents_query.results.first %}
+
+  {% if document == nil %}
+
+    {"error": "{{ l.response_texts.not_found }}"}
+
+  {% else %}
+
+    {% include "shared/tickets/check_user_access" %}
+
+    {% if error != nil %}
+
+      {"error": "{{ error }}"}
+
+    {% else %}
+
+      {% assign tickets_deletion = "destroy_ticket" | db_delete_one: _id: document._id %}
+
+      {"message": "{{ l.response_texts.destroyed_ticket }}"}
+
+    {% endif %}
+  {% endif %}
+{% endif %}

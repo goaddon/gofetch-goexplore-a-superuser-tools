@@ -1,0 +1,169 @@
+<h5 class="mb-4">{{ l.headlines.webshops }}</h5>
+
+{% if error != nil %}
+
+  <p class="text-danger">{{ error }}.</p>
+
+{% else %}
+
+  {% include "shared/extra_table_cols" %}
+
+  {% assign scope_names = "inactive erroring active" | split: " " %}
+  {% assign scope_names = scope_names | push_to_array: nil | reverse %}
+
+  <div class="card mb-4">
+    <div class="card-header">
+      <ul class="nav nav-tabs card-header-tabs">
+        {% for scope_name in scope_names %}
+          <li class="nav-item">
+            {% if scope_name == scope %}
+              {% assign active_bool = " active" %}
+            {% else %}
+              {% assign active_bool = "" %}
+            {% endif %}
+            <a class="nav-link{{ active_bool }}" href="{{ 'webshops__index' | path_for: scope: scope_name }}">
+              {% if scope_name == nil %}
+                {{ account.website }}
+              {% else %}
+                {{ l.scope_names[scope_name] }}
+              {% endif %}
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="card-body">
+      {% if documents.size == 0 %}
+        <p>{{ l.explainers.no_webshops }}</p>
+      {% else %}
+        {% assign now = "now" | in_time_zone %}
+        {% assign to  = now | date: "%s" %}
+        <table class="table">
+          <thead>
+            <tr>
+              <th class="border-0">{{ l.headers.config }}</th>
+              <th class="border-0">{{ l.headers.relay_name }}</th>
+              <th class="border-0"></th>
+              <th class="border-0"></th>
+              {% include "shared/extra_table_ths" %}
+            </tr>
+          </thead>
+          <tbody>
+            {% for document in documents %}
+              {% assign relay_id    = document.relay_id %}
+              {% assign company_id  = document.company_id %}
+              <tr>
+                <td>
+                  {% if relays[relay_id] != nil %}
+                    <samp>
+                      {% assign identifiable_config_keys = 0 %}
+                      {% for identifiable_config_key in relays[relay_id].identifiable_config_keys %}
+                        {% if identifiable_config_key != relays[relay_id].identifiable_config_keys.first %}
+                          &#183;
+                        {% endif %}
+                        {% if document.config[identifiable_config_key] != nil and document.config[identifiable_config_key] != "" %}
+                          {% assign identifiable_config_keys = identifiable_config_keys | plus: 1 %}
+                          {{ document.config[identifiable_config_key] | decrypt }}
+                        {% endif %}
+                      {% endfor %}
+
+                      <span class="text-secondary">
+                        {% if identifiable_config_keys == 0 %}
+                          {{ l.informations.no_identifiable_config_keys }}
+                        {% endif %}
+                      </span>
+                    </samp>
+                  {% endif %}
+
+                  {% assign badge_time  = nil %}
+                  {% assign badge_style = nil %}
+                  {% assign duration    = nil %}
+
+                  {% if document.active != true %}
+
+                    <span class="border rounded text-nowrap px-1 text-secondary border-secondary">{{ l.badges.inactive }}</span>
+
+                  {% elsif document.got_error_at != nil %}
+
+                    {% assign badge_time  = "got_error_at" %}
+                    {% assign badge_style = "danger" %}
+                    {% include "webshops/badge_duration" %}
+
+                  {% elsif document.got_started_at != nil %}
+
+                    {% if document.got_finished_at == nil %}
+
+                      <span class="border rounded text-nowrap px-1 text-light border-primary bg-primary">{{ l.badges.reset }}</span>
+
+                      {% assign badge_time    = "got_started_at" %}
+                      {% assign badge_style   = "primary" %}
+
+                    {% elsif document.got_finished_at < document.got_started_at %}
+
+                      {% assign badge_time    = "got_started_at" %}
+                      {% assign badge_style   = "primary" %}
+
+                    {% elsif document.got_started_at < document.got_finished_at %}
+
+                      {% assign badge_time    = "got_finished_at" %}
+                      {% assign badge_style   = "success" %}
+                      {% include "webshops/badge_duration" %}
+                    
+                    {% endif %}
+                  {% endif %}
+
+                  {% if badge_time != nil %}
+
+                    {% include "webshops/time_badge" %}
+
+                  {% endif %}
+
+                  {% assign document_id = document._id %}
+
+                  {% if tickets[document_id] != nil %}
+
+                    <span class="border rounded text-nowrap px-1 text-light border-dark bg-dark">
+
+                      {{ tickets[document_id].size }} {% if tickets[document_id].size == 1 %}{{ l.badges.ticket }}{% else %}{{ l.badges.tickets }}{% endif %}
+
+                    </span>
+
+                  {% endif %}
+                </td>
+                <td>
+                  {% if relays[relay_id] == nil %}
+                    <span class="border rounded text-nowrap px-1 text-light border-danger bg-danger">{{ l.badges.no_relay }}</span>
+                  {% else %}
+                    {{ relays[relay_id].name }}
+                  {% endif %}
+                </td>
+                {% assign links = "edit show" | split: " " %}
+                {% for link in links %}
+
+                  {% capture link_path %}webshops__{{ link }}{% endcapture %}
+
+                  {% if link == "edit" %}
+
+                    {% assign link_icon = "fas fa-wrench" %}
+
+                  {% else %}
+
+                    {% assign link_icon = "fas fa-code" %}
+
+                  {% endif %}
+
+                  {% assign link_name = l.buttons[link] %}
+
+                  {% include "shared/table_link" %}
+                {% endfor %}
+                {% include "shared/extra_table_links" %}
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% endif %}
+    </div>
+  </div>
+
+  {% include "shared/pagination" %}
+{% endif %}
