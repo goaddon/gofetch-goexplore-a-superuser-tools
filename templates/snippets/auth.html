@@ -61,7 +61,7 @@
           <b>{{ l.headers.interface_link }}:</b>
         </td>
         <td>
-          <a href="{{ project.secrets.gofetch_interface_url }}#action=auths__show&auth_id={{ document._id }}" target="_blank">{{ l.links.external_link }} <i class="fas fa-external-link-alt"></i></a>
+          <a href="{{ session.protocol }}{{ project.secrets.gofetch_interface_url }}#action=auths__show&auth_id={{ document._id }}" target="_blank">{{ l.links.external_link }} <i class="fas fa-external-link-alt"></i></a>
         </td>
       </tr>
       {% if document.webshop_id != nil %}
