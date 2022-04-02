@@ -2,7 +2,7 @@
   "en": {
     "subjects": {
       "company": "Ticket created by",
-      "auth": "Ticket create by initiator of auth",
+      "auth": "Ticket created by initiator of auth",
       "ticket": "Ticket created"
     },
     "history": {
