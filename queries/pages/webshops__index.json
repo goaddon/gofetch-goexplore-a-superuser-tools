@@ -15,6 +15,9 @@
       "got_finished_at": 1,
       "got_error_at": 1,
       "company_id": 1
+    },
+    "sort": {
+      "relay_id": 1
     }
   },
   "tickets": {
