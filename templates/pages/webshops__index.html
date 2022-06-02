@@ -31,14 +31,7 @@
 
     {% assign documents_query = "webshops" | db_find: query: query, page: params.page, per_page: params.per_page %}
     {% assign documents       = documents_query.results %}
-
-    {% assign webshop_ids = "" %}
-
-    {% for document in documents %}
-      {% capture webshop_ids %}{{ webshop_ids }} {{ document._id }}{% endcapture %}
-    {% endfor %}
-
-    {% assign webshop_ids = webshop_ids | lstrip | split: " " | uniq %}
+    {% assign webshop_ids     = documents | map: "_id" | uniq %}
 
     {% if webshop_ids.size > 0 %}
 
