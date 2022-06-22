@@ -33,7 +33,7 @@
 
   {% if ticket_insertion.created_count == 1 %}
 
-    {"url": "{{ 'tickets__show' | path_for: id: ticket_insertion._id }}", "success": "{{ l.ticket_created }}"}
+    {"url": "{{ 'tickets__show' | path_for: id: ticket_insertion.document._id }}", "success": "{{ l.ticket_created }}"}
 
   {% else %}
 
