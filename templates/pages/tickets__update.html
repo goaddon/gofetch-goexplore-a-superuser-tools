@@ -169,16 +169,7 @@
               {% assign job_ids = nil | new_hash %}
 
               {% include "shared/superuser_ticket_url" %}
-
-              {% if project.secrets.gofetch_interface_url != nil %}
-
-                {% capture ticket_url %}{{ session.protocol }}{{ project.secrets.gofetch_interface_url }}#action=tickets__show&ticket_id={{ document._id }}&token={{ document.token | decrypt }}{% endcapture %}
-
-              {% else %}
-
-                {% assign ticket_url = nil %}
-
-              {% endif %}
+              {% include "shared/ticket_url" %}              
 
               {% for recipient in log_entry.recipients %}
 

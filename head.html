@@ -185,7 +185,7 @@
   };
 
   jobUrl = function() {
-    return "{{ 'jobs__show' | path_for: id: 'id_placeholder', format: 'json' }}";
+    return "{{ 'superuser_tools_jobs__show' | path_for: id: 'id_placeholder', format: 'json' }}";
   };
 
   checkEmailJob = function(log_entry_id, job_id, attempts_left = 3) {
