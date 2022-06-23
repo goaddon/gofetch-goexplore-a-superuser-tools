@@ -16,13 +16,16 @@
 
     {% else %}
 
+      {% assign auth_update = nil | new_hash %}
+
       {% if params.remote_ip != nil %}
 
-        {% assign auth_update = nil | remote_ip: params.remote_ip | encrypt %}
+        {% assign remote_ip   = params.remote_ip | encrypt %}
+        {% assign auth_update = auth_update | push_to_hash: remote_ip: remote_ip %}
 
       {% endif %}
 
-      {% if auth_update != nil %}
+      {% if auth_update.size > 0 %}
 
         {% assign auths_update = "update_auth" | db_update_one: _id: document._id, document: auth_update %}
 
