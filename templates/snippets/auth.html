@@ -54,6 +54,11 @@
         </td>
         <td>
           {{ document.remote_ip | decrypt }}
+          &#183;
+          <form class="replace-remote-ip-form" action="{{ 'auths__update' | path_for: id: document._id, format: 'js' }}" method="patch" data-remote="true">
+            <input type="hidden" name="remote_ip" value="{{ session.ip }}">
+            <input type="submit" class="bg-body border-0 link-primary p-0" value="{{ l.links.replace_remote_ip_with }} {{ session.ip }}">
+          </form>
         </td>
       </tr>
       <tr>

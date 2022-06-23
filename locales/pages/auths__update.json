@@ -1,0 +1,9 @@
+{
+  "en": {
+    "response_texts": {
+      "no_access": "You don't have access to this auth",
+      "updated_auth": "The auth has been updated",
+      "nothing_to_update": "There is nothing to update"
+    }
+  }
+}

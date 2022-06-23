@@ -1,0 +1,43 @@
+{% if account != nil and user.superuser %}
+
+  {% assign documents_query   = "auths" | db_find: _id: params.id, company_id: account._id %}
+  {% assign document          = documents_query.results.first %}
+
+  {% if document != nil %}
+
+    {% assign now         = "now" | in_time_zone %}
+    {% assign created_at  = document._id | generation_time %}
+
+    {% include "shared/auths/show_auth" %}
+
+    {% unless show_auth %}
+
+      flashAlert("error", "{{ l.response_texts.no_access }}");
+
+    {% else %}
+
+      {% if params.remote_ip != nil %}
+
+        {% assign auth_update = nil | remote_ip: params.remote_ip | encrypt %}
+
+      {% endif %}
+
+      {% if auth_update != nil %}
+
+        {% assign auths_update = "update_auth" | db_update_one: _id: document._id, document: auth_update %}
+
+        flashAlert("success", "{{ l.response_texts.updated_auth }}");
+
+      {% else %}
+
+        flashAlert("message", "{{ l.response_texts.nothing_to_update }}");
+
+      {% endif %}
+
+      Turbo.visit(window.location);
+
+    {% endunless %}
+
+  {% endif %}
+
+{% endif %}

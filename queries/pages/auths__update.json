@@ -1,0 +1,22 @@
+{
+  "auths": {
+    "klass": "auths",
+    "query": {
+      "_id": "{{ _id }}"
+    },
+    "projection": {
+      "_id": 1,
+      "relay_id": 1,
+      "webshop_id": 1
+    }
+  },
+  "update_auth": {
+    "klass": "auths",
+    "query": {
+      "_id": "{{ _id }}"
+    },
+    "document": {
+      "$set": "{{ document }}"
+    }
+  }
+}
