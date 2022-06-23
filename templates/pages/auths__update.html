@@ -21,7 +21,7 @@
       {% if params.remote_ip != nil %}
 
         {% assign remote_ip   = params.remote_ip | encrypt %}
-        {% assign auth_update = auth_update | push_to_hash: remote_ip: remote_ip %}
+        {% assign auth_update = auth_update | push_to_hash: "remote_ip", remote_ip %}
 
       {% endif %}
 
