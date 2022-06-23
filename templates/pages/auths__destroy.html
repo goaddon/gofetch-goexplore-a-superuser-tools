@@ -16,7 +16,7 @@
 
     {% else %}
 
-      {% assign tickets_deletion = "destroy_auth" | db_delete_one: _id: document._id %}
+      {% assign auths_deletion = "destroy_auth" | db_delete_one: _id: document._id %}
 
       {"message": "{{ l.response_texts.destroyed_auth }}"}
 
