@@ -19,6 +19,15 @@
         "error": "An error occurred",
         "log": "The following was logged"
       }
+    },
+    "explainers": {
+      "new_auth": {
+        "p1": "You can change this configuration and",
+        "p2": "submit a new auth"
+      }
+    },
+    "buttons": {
+      "create_auth": "Submit new auth"
     }
   }
 }
