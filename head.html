@@ -386,8 +386,8 @@
       var form_submit             = $(this).find(":input[type=submit]");
       var form_submitting         = $(this).find("[data-type=submitting]");
       var request_data            = {};
-
       var config_input            = $(this).find(":input[name=config]");
+
       if (config_input.length > 0) {
         request_data["config"]      = JSON.parse(config_input.val());
       }
@@ -600,6 +600,22 @@
     return Prism.highlightAll();
   };
 
+  makeParamsFromJson = function(webshop_config) {
+    return Object.keys(webshop_config).map(function(k) {
+        return encodeURIComponent(k) + "=" + encodeURIComponent(webshop_config[k]);
+    }).join('&')
+  };
+
+  submitNewAuth = function() {
+    $("a#new_auth_button").off("click");
+    $("a#new_auth_button").click(function() {
+      var url             = $(this).data("url");
+      var webshop_config  = JSON.parse($("textarea[name=new_auth_webshop_config]").val());
+      var auth_params     = makeParamsFromJson(webshop_config);
+      $(this).attr("href", this.href + auth_params);
+    });
+  };
+
   function textAreaAdjust(element) {
     element.style.height = "1px";
     element.style.height = (26 + element.scrollHeight) + "px";
@@ -635,12 +651,16 @@
       checkDestroyWebshopJob(destroy_webshop_job_url);
     }
 
-    if ($("body").hasClass("webshops-edit") || $("body").hasClass("webshops-show")) {
+    if ($("body").hasClass("webshops-edit") || $("body").hasClass("webshops-show") || $("body").hasClass("auths-show") || $("body").hasClass("tickets-show")) {
       indentJsonInput();
     }
 
     if ($("body").hasClass("auths-show") || $("body").hasClass("webshops-show") || $("body").hasClass("webshops-edit") || $("body").hasClass("tickets-show")) {
       applyMarkdownAndSyntax();
+    }
+
+    if ($("body").hasClass("auths-show") || $("body").hasClass("tickets-show")) {
+      submitNewAuth();
     }
   })
 </script>

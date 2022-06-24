@@ -103,6 +103,28 @@
   {% assign auth = document %}
   {% include "shared/auth_result" %}
 
+  <p>
+    {{ l.explainers.new_auth.p1 }}
+    <a href="#new_auth" aria-controls="new_auth" aria-expanded="false" data-bs-toggle="collapse">
+      {{ l.explainers.new_auth.p2 }} <i class="fas fa-caret-down"></i>
+    </a>
+  </p>
+
+  <div id="new_auth" class="collapse">
+    {% assign encrypted_hash = document.webshop_config %}
+    {% include "shared/decrypt_hash" %}
+
+    <form class="create-auth-form mb-4" action="{{ 'webshops__update' | path_for: id: document._id, format: 'json' }}" method="patch">
+
+      <div class="json-container">
+        <textarea class="border" name="config">{{ decrypted_hash | hash_to_json }}</textarea>
+      </div>
+      <div class="d-grid gap-2 mt-3">
+        <input type="submit" class="btn btn-outline-primary" value="{{ l.buttons.create_auth }}">
+      </div>
+    </form>
+  </div>
+
   <h5 class="my-4">{{ l.headlines.tickets }}</h5>
 
   <p>
