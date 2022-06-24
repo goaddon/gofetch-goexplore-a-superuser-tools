@@ -2,9 +2,7 @@
   {{ l.headlines.intro }} <a href="{{ 'webshops__index' | path_for }}">{{ l.headlines.return }} <i class="fas fa-undo"></i></a>
 </h5>
 
-<script>
-  var destroy_webshop_job_url = "{{ 'superuser_tools_jobs__show' | path_for: id: params.id, format: 'json' }}";
-</script>
+<div class="d-none" id="destroy_webshop_job_url" data-url="{{ 'superuser_tools_jobs__show' | path_for: id: params.id, format: 'json' }}"></div>
 
 <p class="pending-explainer">{{ l.explainers.pending }}</p>
 
