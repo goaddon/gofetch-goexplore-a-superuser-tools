@@ -498,7 +498,7 @@
   };
 
   checkDestroyWebshopJob = function(job_url) {
-    if (destroy_webshop_job_url === job_url) {
+    if ($("#destroy_webshop_job_url").data("url") === job_url) {
       return setTimeout((function() {
         return $.ajax({
           type: "get",
@@ -648,7 +648,7 @@
     }
 
     if ($("body").hasClass("destroy_webshop_jobs-show")) {
-      checkDestroyWebshopJob(destroy_webshop_job_url);
+      checkDestroyWebshopJob($("#destroy_webshop_job_url").data("url"));
     }
 
     if ($("body").hasClass("webshops-edit") || $("body").hasClass("webshops-show") || $("body").hasClass("auths-show") || $("body").hasClass("tickets-show")) {
