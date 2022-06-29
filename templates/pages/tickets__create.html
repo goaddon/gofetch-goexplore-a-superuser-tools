@@ -3,10 +3,7 @@
   {% assign token       = nil | new_uuid | encrypt %}
   {% assign log         = "" | split: " " %}
   {% assign now         = "now" | in_time_zone %}
-  {% assign document    = nil | new_hash: status: "opened", author_id: user._id %}
-  {% assign document    = document | push_to_hash: "token", token %}
-  {% assign document    = document | push_to_hash: "log", log %}
-  {% assign document    = document | push_to_hash: "opened_at", now %}
+  {% assign document    = nil | new_hash: status: "opened", author_id: user._id, token: token, log: log, opened_at: now, updated_at: now %}
   {% assign encrypt     = "email phone admin_url admin_username admin_password comments ftp_host ftp_username ftp_password ssh_address ssh_password" | split: " " %}
   {% assign field_names = "company_id webshop_id auth_id relay_id" | split: " " %}
   {% assign field_names = field_names | concat: encrypt %}
