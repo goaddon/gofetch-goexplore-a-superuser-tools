@@ -53,7 +53,7 @@
       </p>
 
       <div id="new_auth" class="collapse">
-        {% assign encrypted_hash = document.webshop_config %}
+        {% assign encrypted_hash = auth.webshop_config %}
         {% include "shared/decrypt_hash" %}
 
         <div class="json-container">
