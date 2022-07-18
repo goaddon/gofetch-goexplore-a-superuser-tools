@@ -2,6 +2,13 @@
   "en": {
     "headers": {
       "comments": "Comments"
+    },
+    "buttons": {
+      "view_file": "View attachment"
+    },
+    "modal": {
+      "headline": "Attachment",
+      "close": "Close"
     }
   }
 }
