@@ -17,6 +17,18 @@
 
   {% endif %}
 
+  {% if document.comments != nil and document.comments != "" %}
+
+    {% assign comments_exists = true %}
+
+  {% endif %}
+
+  {% if comments_exists or document.file != nil %}
+
+    {% assign include_comments = true %}
+
+  {% endif %}
+
   {% assign now               = "now" | in_time_zone %}
   {% assign left_tr_count     = 0 %}
   {% assign right_tr_count    = 0 %}
@@ -286,7 +298,7 @@
               {% assign bottom_border_klass = "" %}
 
               {% if t == timeline.last %}
-                {% if left_tr_count >= right_tr_count and document.comments != nil and document.comments != "" %}
+                {% if left_tr_count >= right_tr_count and include_comments %}
 
                   {% assign bottom_border_klass = "border-bottom" %}
 
@@ -306,7 +318,7 @@
             {% endif %}
           {% endfor %}
 
-          {% if left_tr_count < right_tr_count and document.comments != nil and document.comments != "" %}
+          {% if left_tr_count < right_tr_count and include_comments %}
             {% include "ticket/comments" %}
           {% endif %}
         </tbody>
@@ -338,7 +350,7 @@
     </div>
   </div>
 
-  {% if left_tr_count >= right_tr_count and document.comments != nil and document.comments != "" %}
+  {% if left_tr_count >= right_tr_count and include_comments %}
 
     <table class="table mb-0">
       <tbody>

@@ -17,7 +17,37 @@
 <tr>
   <td colspan="2" class="border-top-0">
     <div class="border-start border-3 ps-2">
-      {{ document.comments | decrypt | strip_html | newline_to_br }}
+      {% if comments_exists %}
+
+        {{ document.comments | decrypt | strip_html | newline_to_br }}
+
+      {% endif %}
+
+      {% if document.file != nil %}
+
+        <p>
+          <button type="button" class="bg-body border-0 link-primary p-0" data-bs-toggle="modal" data-bs-target="#file_modal">
+            {{ l.buttons.view_file }}
+          </button>
+        </p>
+
+        <div class="modal fade" id="file_modal" tabindex="-1" aria-labelledby="file_modal_label" aria-hidden="true">
+          <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="file_modal_label">{{ l.modal.headline }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <img class="img-fluid img-thumbnail" src="{{ document.file | decrypt }}" width>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">{{ l.modal.close }}</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endif %}
     </div>
   </td>
 </tr>
