@@ -33,6 +33,7 @@
       "got_orders_open_since_3x_at": 1,
       "got_orders_open_since_4x_at": 1,
       "got_error_at": 1,
+      "got_error_since": 1,
       "products_error": 1,
       "categories_error": 1,
       "customers_error": 1,

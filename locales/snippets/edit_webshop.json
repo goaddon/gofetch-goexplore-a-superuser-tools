@@ -52,10 +52,11 @@
         "p1": "has been registered for this webshop"
       },
       "errors": {
-        "intro": "The integration errored",
+        "s1": "The integration errored",
         "ago": "ago",
-        "p1": "The last attempt to import",
-        "p2": "resulted in the following error",
+        "s2": "The error has persisted for",
+        "s3": "The last attempt to import",
+        "s4": "resulted in the following error",
         "categories": "categories",
         "customers": "customers",
         "orders": "orders",
