@@ -156,7 +156,7 @@
 
       {% if document.got_error_at != nil %}
 
-        <p>{{ l.explainers.errors.intro }} <span title="{{ document.got_error_at | in_time_zone | i18n_l: 'wday_date_hours_minutes' | capitalize }}">{{ document.got_error_at | time_distance_in_words: now }}</span> {{ l.explainers.errors.ago }}.</p>
+        <p>{{ l.explainers.errors.s1 }} <span title="{{ document.got_error_at | in_time_zone | i18n_l: 'wday_date_hours_minutes' | capitalize }}">{{ document.got_error_at | time_distance_in_words: now }}</span> {{ l.explainers.errors.ago }}. {{ l.explainers.errors.s2 }} <span title="{{ document.got_error_since | in_time_zone | i18n_l: 'wday_date_hours_minutes' | capitalize }}">{{ document.got_error_since | time_distance_in_words: now }}</span>.</p>
 
       {% endif %}
 
@@ -168,7 +168,7 @@
 
         {% if document[error_field] != nil and document[error_field].size > 0 %}
 
-          <p>{{ l.explainers.errors.p1 }} {{ l.explainers.errors[error_klass] }} {{ l.explainers.errors.p2 }}:</p>
+          <p>{{ l.explainers.errors.s3 }} {{ l.explainers.errors[error_klass] }} {{ l.explainers.errors.s4 }}:</p>
 
           {% assign errors = "" | split: " " %}
 
