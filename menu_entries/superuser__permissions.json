@@ -9,7 +9,7 @@
     },
     {
       "controller": "superusers",
-      "action": "show"
+      "action": "permissions"
     }
   ]
 }
