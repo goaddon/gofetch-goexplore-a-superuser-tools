@@ -290,7 +290,7 @@
                             </div>
                           </div>
 
-                          <p>{{ l.body_sample.reset_intro }} <span class="bg-body border-0 link-primary p-0" style="cursor: pointer;" data-action="template" data-value="{{ endpoint.body_example | hash_to_json | url_encode }}">{{ l.body_sample.reset_button }}</span>{% if endpoint.templates != nil and endpoint.templates.size > 0 %} {{ l.body_sample.reset_outro }}{% endif %}.</p>
+                          <p>{{ l.body_sample.reset_intro }} <span class="bg-transparent border-0 link-primary p-0" style="cursor: pointer;" data-action="template" data-value="{{ endpoint.body_example | hash_to_json | url_encode }}">{{ l.body_sample.reset_button }}</span>{% if endpoint.templates != nil and endpoint.templates.size > 0 %} {{ l.body_sample.reset_outro }}{% endif %}.</p>
 
                           {% if endpoint.templates != nil and endpoint.templates.size > 0 %}
 

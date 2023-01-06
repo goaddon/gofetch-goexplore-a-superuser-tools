@@ -60,7 +60,7 @@
             <form class="replace-remote-ip-form d-inline" action="{{ 'auths__update' | path_for: id: document._id, format: 'js' }}" method="post" data-remote="true">
               <input type="hidden" name="_method" value="patch">
               <input type="hidden" name="remote_ip" value="{{ session.ip }}">
-              <input type="submit" class="bg-body border-0 link-primary p-0" value="{{ l.links.replace_remote_ip_with }} {{ session.ip }}">
+              <input type="submit" class="bg-transparent border-0 link-primary p-0" value="{{ l.links.replace_remote_ip_with }} {{ session.ip }}">
             </form>
           {% endif %}
         </td>
@@ -88,7 +88,7 @@
                 <form method="post" action="{{ 'accounts__switch' | path_for: id: company._id }}">
                   <input type="hidden" name="_method" value="patch">
                   <input type="hidden" name="redirect" value="{{ 'webshops__show' | path_for: id: webshop._id }}">
-                  <input class="bg-body border-0 link-primary p-0" type="submit" value="{{ company.website }}">
+                  <input class="bg-transparent border-0 link-primary p-0" type="submit" value="{{ company.website }}">
                 </form>
               {% else %}
                 {{ l.informations.unknown_webshop }} <span class="text-secondary border rounded border-secondary px-1">{{ webshop._id }}</span> {{ l.informations.unknown_company }} <span class="text-secondary border rounded border-secondary px-1">{{ webshop.company_id }}</span>

@@ -12,10 +12,10 @@
         <input type="hidden" name="_method" value="patch">
         <input type="hidden" name="redirect" value="{{ link_path | path_for: id: document._id, page: documents_query.page, per_page: documents_query.per_page, scope: scope }}">
         <div class="d-none d-xl-block">
-          <input type="submit" value="{{ link_name }}" class="bg-body border-0 link-primary p-0">
+          <input type="submit" value="{{ link_name }}" class="bg-transparent border-0 link-primary p-0">
         </div>
         <div class="d-xl-none">
-          <button type="submit" class="bg-body border-0 link-primary p-0"><i class="text-primary {{ link_icon }}"></i></button>
+          <button type="submit" class="bg-transparent border-0 link-primary p-0"><i class="text-primary {{ link_icon }}"></i></button>
         </div>
       </form>
     {% endif %}
