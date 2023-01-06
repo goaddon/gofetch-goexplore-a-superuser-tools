@@ -155,7 +155,7 @@
 
                 <form class="d-inline" action="{{ 'tickets__update' | path_for: id: document._id, format: 'js' }}" method="post" data-remote="true">
                   <input type="hidden" name="_method" value="patch">
-                  <input type="hidden" name="superuser_id" value="{{ user._id }}"><input type="submit" class="bg-body border-0 link-primary p-0" value="{{ l.update_status.links.claim }}">{{ claim_append }}
+                  <input type="hidden" name="superuser_id" value="{{ user._id }}"><input type="submit" class="bg-transparent border-0 link-primary p-0" value="{{ l.update_status.links.claim }}">{{ claim_append }}
                 </form>
 
               {% endif %}
@@ -229,14 +229,14 @@
 
                     <form class="d-inline" action="{{ 'tickets__update' | path_for: id: document._id, format: 'js' }}" method="post" data-remote="true">
                       <input type="hidden" name="_method" value="patch">
-                      <input type="hidden" name="status" value="{{ status }}"><input type="submit" class="bg-body border-0 link-primary p-0" id="markdown_confirm" value="{{ link_text }}" data-title="{{ l.confirm_escalate.title }}" data-confirm="" data-markdown="{{ l.confirm_escalate.confirm_intro | strip_html | url_encode }}{{ relay.author | strip_html | url_encode }}{{ l.confirm_escalate.confirm_outro | strip_html | url_encode }}{{ relay.support_fees | strip_html | url_encode }}" data-commit="{{ l.confirm_escalate.commit }}" data-cancel="{{ l.confirm_escalate.cancel }}" data-commit-class="btn btn-outline-primary" data-cancel-class="text-primary">{{ append_string }}
+                      <input type="hidden" name="status" value="{{ status }}"><input type="submit" class="bg-transparent border-0 link-primary p-0" id="markdown_confirm" value="{{ link_text }}" data-title="{{ l.confirm_escalate.title }}" data-confirm="" data-markdown="{{ l.confirm_escalate.confirm_intro | strip_html | url_encode }}{{ relay.author | strip_html | url_encode }}{{ l.confirm_escalate.confirm_outro | strip_html | url_encode }}{{ relay.support_fees | strip_html | url_encode }}" data-commit="{{ l.confirm_escalate.commit }}" data-cancel="{{ l.confirm_escalate.cancel }}" data-commit-class="btn btn-outline-primary" data-cancel-class="text-primary">{{ append_string }}
                     </form>
 
                   {% else %}
 
                     <form class="d-inline" action="{{ 'tickets__update' | path_for: id: document._id, format: 'js' }}" method="post" data-remote="true">
                       <input type="hidden" name="_method" value="patch">
-                      <input type="hidden" name="status" value="{{ status }}"><input type="submit" class="bg-body border-0 link-primary p-0" value="{{ link_text }}">{{ append_string }}
+                      <input type="hidden" name="status" value="{{ status }}"><input type="submit" class="bg-transparent border-0 link-primary p-0" value="{{ link_text }}">{{ append_string }}
                     </form>
 
                   {% endif %}
@@ -259,7 +259,7 @@
 
                           <form action="{{ 'tickets__update' | path_for: id: document._id, format: 'js' }}" method="post" data-remote="true">
                             <input type="hidden" name="_method" value="patch">
-                            <input type="hidden" name="superuser_id" value="{{ superuser[0] }}"><input type="submit" class="px-3 py-1 bg-body border-0 link-primary px-3" value="{{ superuser[1].email }}">
+                            <input type="hidden" name="superuser_id" value="{{ superuser[0] }}"><input type="submit" class="px-3 py-1 bg-transparent border-0 link-primary px-3" value="{{ superuser[1].email }}">
                           </form>
 
                         {% endif %}
@@ -277,7 +277,7 @@
                       <li>
                         <form action="{{ 'tickets__update' | path_for: id: document._id, format: 'js' }}" method="post" data-remote="true">
                           <input type="hidden" name="_method" value="patch">
-                          <input type="hidden" name="superuser_id" value="none"><input type="submit" class="px-3 py-1 bg-body border-0 link-danger px-3" value="{{ l.assign.unassign }}">
+                          <input type="hidden" name="superuser_id" value="none"><input type="submit" class="px-3 py-1 bg-transparent border-0 link-danger px-3" value="{{ l.assign.unassign }}">
                         </form>
                       </li>
 

@@ -240,6 +240,16 @@
     element.style.height = (26 + element.scrollHeight) + "px";
   }
 
+  function insertTicketMessage(element) {
+    var target      = $("[data-message-id=" + element.getAttribute("data-target-message-id") + "]");
+    var markdown    = decodeURIComponent(target.attr("data-markdown").replace(/\+/g, " "));
+    var textarea    = document.querySelector("textarea[name=message]");
+    textarea.value  = markdown;
+
+    textarea.focus();
+    return(textAreaAdjust(textarea));
+  }
+
   function copyFormInput(form_field_name) {
     var input                   = document.querySelector("[data-copy='" + form_field_name + "']");
     var button                  = document.querySelector("[data-copy-button='" + form_field_name + "']");
@@ -615,11 +625,6 @@
       $(this).attr("href", this.href + auth_params);
     });
   };
-
-  function textAreaAdjust(element) {
-    element.style.height = "1px";
-    element.style.height = (26 + element.scrollHeight) + "px";
-  }
 
   $(document).on('turbo:load', function() {
     if ($("body").hasClass("webshops-show")) {

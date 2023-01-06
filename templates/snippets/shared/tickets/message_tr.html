@@ -23,7 +23,7 @@
 <tr>
   <td colspan="2" class="pt-0 mt-0">
     {% if superusers[identifier] != nil %}
-      <div class="mb-0 markdown border-start border-3 ps-2" data-markdown="{{ log_entry.message | decrypt | strip_html | url_encode }}"></div>
+      <div class="mb-0 markdown border-start border-3 ps-2" data-message-id="{{ log_entry.id }}" data-markdown="{{ log_entry.message | decrypt | strip_html | url_encode }}"></div>
     {% else %}
       <div class="mb-0 markdown border-start border-3 ps-2">{{ log_entry.message | decrypt | strip_html | newline_to_br }}</div>
     {% endif %}

@@ -46,7 +46,7 @@
           <span class="text-{{ active_colour }}"><b>{{ l.explainers.active[status] }}</b></span>.
           {{ l.explainers.active.p3 }}
           <input type="hidden" name="active" value="{{ active_option }}">
-          <input type="submit" class="bg-body border-0 link-primary p-0" value="{{ l.explainers.active.active_options[status] }}">.
+          <input type="submit" class="bg-transparent border-0 link-primary p-0" value="{{ l.explainers.active.active_options[status] }}">.
         </p>
       </form>
     </div>
@@ -145,7 +145,7 @@
     <form class="d-inline" action="{{ 'webshops__destroy' | path_for: id: document._id }}" method="post">
       <input type="hidden" name="_method" value="delete">
       {{ l.destroy.intro }}
-      <input type="submit" class="bg-body border-0 link-danger p-0" value="{{ l.destroy.button }}" data-title="{{ l.destroy.title }}" data-confirm="{{ l.destroy.confirm }}" data-commit="{{ l.destroy.commit }}" data-cancel="{{ l.destroy.cancel }}" data-commit-class="btn btn-outline-danger" data-cancel-class="text-primary">. {{ l.destroy.outro }}
+      <input type="submit" class="bg-transparent border-0 link-danger p-0" value="{{ l.destroy.button }}" data-title="{{ l.destroy.title }}" data-confirm="{{ l.destroy.confirm }}" data-commit="{{ l.destroy.commit }}" data-cancel="{{ l.destroy.cancel }}" data-commit-class="btn btn-outline-danger" data-cancel-class="text-primary">. {{ l.destroy.outro }}
     </form>
   </div>
 
